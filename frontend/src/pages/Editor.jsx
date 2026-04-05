@@ -6,10 +6,22 @@ export default function Editor() {
   const editorRef = useRef(null);
   const [isOptimizing, setIsOptimizing] = useState(false);
   const [metrics, setMetrics] = useState(null);
-  const [lenguaje, setLenguaje] = useState('HTML/CSS'); 
+  // Por defecto lo ponemos en Python para que tu prueba no falle si te olvidas de cambiarlo
+  const [lenguaje, setLenguaje] = useState('Python'); 
   const [codigoBackend, setCodigoBackend] = useState('');
+  const [proyectos, setProyectos] = useState([]);
+  const [proyectoId, setProyectoId] = useState('');
 
   useEffect(() => {
+    fetch('http://127.0.0.1:8000/proyectos')
+      .then(res => res.json())
+      .then(data => {
+        const enDesarrollo = data.filter(p => p.estado === 'En Desarrollo');
+        setProyectos(enDesarrollo);
+        if (enDesarrollo.length > 0) setProyectoId(enDesarrollo[0].id);
+      })
+      .catch(err => console.error("Error cargando proyectos:", err));
+
     if (!editorRef.current) {
       editorRef.current = grapesjs.init({
         container: '#editor-canvas', fromElement: false, height: '100%', width: '100%', storageManager: false, panels: { defaults: [] },
@@ -45,11 +57,8 @@ export default function Editor() {
     finally { setIsOptimizing(false); }
   };
 
-  // NUEVA FUNCIÓN: Descarga física del archivo de código
   const descargarCodigo = () => {
     if (!metrics) return;
-    
-    // Determinamos la extensión del archivo según el lenguaje elegido
     let extension = 'html';
     if (lenguaje === 'Node.js') extension = 'js';
     if (lenguaje === 'Python') extension = 'py';
@@ -73,19 +82,27 @@ export default function Editor() {
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', flexGrow: 1, height: '100%' }}>
-        <div className="header-actions" style={{ display: 'flex', gap: '20px', alignItems: 'center' }}>
+        <div className="header-actions" style={{ display: 'flex', gap: '20px', alignItems: 'center', flexWrap: 'wrap' }}>
           <span style={{ color: '#a5b4fc', fontWeight: 'bold' }}>Arquitectura Full-Stack</span>
           
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <span style={{ color: '#9ca3af', fontSize: '14px' }}>Lenguaje:</span>
-            <select value={lenguaje} onChange={(e) => setLenguaje(e.target.value)} style={{ padding: '5px 10px', borderRadius: '5px', backgroundColor: '#2d2d44', color: 'white', border: '1px solid #3a3a52' }}>
-              <option value="HTML/CSS">HTML/CSS/JS</option>
-              <option value="Node.js">Node.js (Lógica)</option>
-              <option value="Python">Python (Lógica/DER)</option>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginLeft: '15px', borderLeft: '1px solid #3a3a52', paddingLeft: '15px' }}>
+            <span style={{ color: '#9ca3af', fontSize: '14px' }}>Proyecto:</span>
+            <select value={proyectoId} onChange={(e) => setProyectoId(e.target.value)} style={{ padding: '5px 10px', borderRadius: '5px', backgroundColor: '#2d2d44', color: 'white', border: '1px solid #3a3a52', maxWidth: '200px' }}>
+              {proyectos.map(p => <option key={p.id} value={p.id}>{p.nombre}</option>)}
+              {proyectos.length === 0 && <option value="">Sin proyectos en desarrollo</option>}
             </select>
           </div>
 
-          <button className="btn-optimizar" onClick={handleOptimize} disabled={isOptimizing} style={{ marginLeft: 'auto' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <span style={{ color: '#9ca3af', fontSize: '14px' }}>Lenguaje:</span>
+            <select value={lenguaje} onChange={(e) => setLenguaje(e.target.value)} style={{ padding: '5px 10px', borderRadius: '5px', backgroundColor: '#2d2d44', color: 'white', border: '1px solid #3a3a52' }}>
+              <option value="Python">Python (Lógica/DER)</option>
+              <option value="Node.js">Node.js (Lógica)</option>
+              <option value="HTML/CSS">HTML/CSS/JS</option>
+            </select>
+          </div>
+
+          <button className="btn-optimizar" onClick={handleOptimize} disabled={isOptimizing || proyectos.length === 0} style={{ marginLeft: 'auto', opacity: proyectos.length === 0 ? 0.5 : 1 }}>
             {isOptimizing ? '⏳ Green Coding Gemma 2b...' : '✨ Generar Arquitectura Semántica y Medir CO2'}
           </button>
         </div>
@@ -120,7 +137,6 @@ export default function Editor() {
           <div className="metric-card">
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <p style={{ margin: 0, fontSize: '14px', color: '#9ca3af' }}>Refactorización Unificada ({lenguaje})</p>
-              {/* NUEVO BOTÓN PARA DESCARGAR EL CÓDIGO FÍSICO */}
               <button onClick={descargarCodigo} style={{ backgroundColor: '#3b82f6', color: 'white', border: 'none', padding: '5px 10px', borderRadius: '3px', cursor: 'pointer', fontSize: '12px', fontWeight: 'bold' }}>
                 📥 Descargar Archivo
               </button>
