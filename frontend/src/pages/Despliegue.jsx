@@ -32,7 +32,6 @@ export default function Despliegue() {
     setLogs("Iniciando compilador virtual... analizando código fuente y validando métricas eco-eficientes...\n");
     
     try {
-      // Recuperamos la última métrica de CodeCarbon y el umbral de configuración
       const resOpt = await fetch('http://127.0.0.1:8000/optimizaciones');
       const dataOpt = await resOpt.json();
       const ultimaOpt = dataOpt.length > 0 ? dataOpt[0] : null;
@@ -42,7 +41,6 @@ export default function Despliegue() {
       const dataConf = await resConf.json();
       const umbral = dataConf ? dataConf.umbral_co2 : 0.05;
 
-      // Ejecutamos la prueba de sintaxis real
       const resTest = await fetch('http://127.0.0.1:8000/ejecutar-test-real', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -56,7 +54,6 @@ export default function Despliegue() {
       const data = await resTest.json();
       
       if (data.resultado) {
-          // Lógica de Compuerta Ambiental (Eco-Gate)
           if (emisiones > umbral) {
               setEstado('rechazo_ambiental');
               setLogs(data.logs + `\n\n⚠️ [BLOQUEO AMBIENTAL]\nEl código funciona pero su huella energética (${emisiones.toFixed(6)} kg CO2) EX_CEDE el umbral permitido (${umbral} kg CO2).\nRefactorice para reducir el consumo antes de desplegar.`);
@@ -94,7 +91,7 @@ export default function Despliegue() {
   };
 
   return (
-    <div style={{ padding: '30px', color: 'white', maxWidth: '900px', margin: '0 auto' }}>
+    <div style={{ padding: '20px', color: 'white', maxWidth: '900px', margin: '0 auto' }}>
       <h2 style={{ color: '#4ade80' }}>🚀 Pipeline de CI/CD: Validación y Despliegue</h2>
       <p style={{ color: '#a5b4fc', marginBottom: '30px' }}>Control de calidad eco-eficiente para asegurar que solo el código sostenible llegue a la nube.</p>
       
@@ -106,48 +103,54 @@ export default function Despliegue() {
         </select>
       </div>
 
-      <div style={{ backgroundColor: '#252536', padding: '30px', borderRadius: '8px', border: '1px solid #3a3a52', marginBottom: '40px' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-          <h3 style={{ margin: 0 }}>Estado Cloud: 
-            <span style={{ color: estado === 'desplegado' ? '#4ade80' : estado === 'error' ? '#ef4444' : estado === 'rechazo_ambiental' ? '#f97316' : estado === 'aprobado' ? '#f59e0b' : '#a5b4fc', marginLeft: '10px' }}>
-              {estado === 'rechazo_ambiental' ? 'BLOQUEADO POR HUELLA CO2' : estado.toUpperCase()}
+      <div style={{ backgroundColor: '#252536', padding: '20px', borderRadius: '8px', border: '1px solid #3a3a52', marginBottom: '40px' }}>
+        <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', gap: '15px' }}>
+          <h3 style={{ margin: 0, fontSize: '16px' }}>Estado Cloud: 
+            <span style={{ display: 'inline-block', color: estado === 'desplegado' ? '#4ade80' : estado === 'error' ? '#ef4444' : estado === 'rechazo_ambiental' ? '#f97316' : estado === 'aprobado' ? '#f59e0b' : '#a5b4fc', marginLeft: '10px', marginTop: '5px' }}>
+              {estado === 'rechazo_ambiental' ? 'BLOQUEADO POR CO2' : estado.toUpperCase()}
             </span>
           </h3>
-          {estado === 'pendiente' && <button onClick={ejecutarPruebaReal} disabled={proyectos.length === 0} style={{ padding: '10px', backgroundColor: '#3b82f6', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer', fontWeight: 'bold' }}>▶️ Ejecutar Pruebas Físicas</button>}
-          {(estado === 'error' || estado === 'rechazo_ambiental') && <button onClick={ejecutarPruebaReal} style={{ padding: '10px', backgroundColor: '#ef4444', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer', fontWeight: 'bold' }}>🔄 Reintentar Pipeline</button>}
-          {estado === 'aprobado' && <button onClick={ejecutarDespliegue} style={{ padding: '10px', backgroundColor: '#4ade80', color: '#1e1e2f', border: 'none', borderRadius: '5px', cursor: 'pointer', fontWeight: 'bold' }}>☁️ Aprobar Despliegue AWS</button>}
+          
+          {estado === 'pendiente' && <button onClick={ejecutarPruebaReal} disabled={proyectos.length === 0} style={{ padding: '10px', backgroundColor: '#3b82f6', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer', fontWeight: 'bold', flexGrow: 1 }}>▶️ Ejecutar Pruebas Físicas</button>}
+          {(estado === 'error' || estado === 'rechazo_ambiental') && <button onClick={ejecutarPruebaReal} style={{ padding: '10px', backgroundColor: '#ef4444', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer', fontWeight: 'bold', flexGrow: 1 }}>🔄 Reintentar Pipeline</button>}
+          {estado === 'aprobado' && <button onClick={ejecutarDespliegue} style={{ padding: '10px', backgroundColor: '#4ade80', color: '#1e1e2f', border: 'none', borderRadius: '5px', cursor: 'pointer', fontWeight: 'bold', flexGrow: 1 }}>☁️ Aprobar Despliegue AWS</button>}
         </div>
 
-        <div style={{ backgroundColor: '#1e1e2f', padding: '15px', borderRadius: '5px', fontFamily: 'monospace', color: '#d1d5db', minHeight: '160px', whiteSpace: 'pre-wrap' }}>
+        <div style={{ backgroundColor: '#1e1e2f', padding: '15px', borderRadius: '5px', fontFamily: 'monospace', color: '#d1d5db', minHeight: '160px', overflowX: 'auto', whiteSpace: 'pre-wrap', fontSize: '12px' }}>
           {logs || "Esperando inicio de pipeline..."}
         </div>
       </div>
 
       <h3 style={{ color: '#a5b4fc', borderBottom: '1px solid #3a3a52', paddingBottom: '10px' }}>🗄️ Historial de Despliegues Cloud Certificados</h3>
-      <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '15px', backgroundColor: '#252536', borderRadius: '8px', overflow: 'hidden' }}>
-        <thead>
-          <tr style={{ backgroundColor: '#1a1a24', color: '#4ade80', textAlign: 'left' }}>
-            <th style={{ padding: '15px' }}>ID</th>
-            <th style={{ padding: '15px' }}>Proyecto</th>
-            <th style={{ padding: '15px' }}>Fecha</th>
-            <th style={{ padding: '15px' }}>Entorno Cloud</th>
-            <th style={{ padding: '15px' }}>Certificación Eco</th>
-          </tr>
-        </thead>
-        <tbody>
-          {historialDespliegues.map((d) => (
-            <tr key={d.id} style={{ borderTop: '1px solid #3a3a52' }}>
-              <td style={{ padding: '15px', color: '#a5b4fc', fontWeight: 'bold' }}>DEP-{d.id.toString().padStart(3, '0')}</td>
-              <td style={{ padding: '15px', fontWeight: 'bold' }}>{d.proyecto_nombre}</td>
-              <td style={{ padding: '15px' }}>{d.fecha_despliegue}</td>
-              <td style={{ padding: '15px' }}>
-                <span style={{ backgroundColor: '#1e3a8a', color: '#93c5fd', padding: '5px 10px', borderRadius: '20px', fontSize: '11px', fontWeight: 'bold' }}>{d.entorno}</span>
-              </td>
-              <td style={{ padding: '15px', color: '#34d399', fontSize: '13px' }}>{d.metricas_eco}</td>
+      
+      {/* SOLUCIÓN DUDA 2: CONTENEDOR CON SCROLL HORIZONTAL (overflowX: auto) */}
+      <div style={{ overflowX: 'auto', borderRadius: '8px', border: '1px solid #3a3a52', marginTop: '15px' }}>
+        <table style={{ width: '100%', borderCollapse: 'collapse', backgroundColor: '#252536', minWidth: '700px' }}>
+          <thead>
+            <tr style={{ backgroundColor: '#1a1a24', color: '#4ade80', textAlign: 'left' }}>
+              <th style={{ padding: '15px' }}>ID</th>
+              <th style={{ padding: '15px' }}>Proyecto</th>
+              <th style={{ padding: '15px' }}>Fecha</th>
+              <th style={{ padding: '15px' }}>Entorno Cloud</th>
+              <th style={{ padding: '15px' }}>Certificación Eco</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {historialDespliegues.map((d) => (
+              <tr key={d.id} style={{ borderTop: '1px solid #3a3a52' }}>
+                <td style={{ padding: '15px', color: '#a5b4fc', fontWeight: 'bold' }}>DEP-{d.id.toString().padStart(3, '0')}</td>
+                <td style={{ padding: '15px', fontWeight: 'bold' }}>{d.proyecto_nombre}</td>
+                <td style={{ padding: '15px' }}>{d.fecha_despliegue}</td>
+                <td style={{ padding: '15px' }}>
+                  <span style={{ backgroundColor: '#1e3a8a', color: '#93c5fd', padding: '5px 10px', borderRadius: '20px', fontSize: '11px', fontWeight: 'bold', whiteSpace: 'nowrap' }}>{d.entorno}</span>
+                </td>
+                <td style={{ padding: '15px', color: '#34d399', fontSize: '13px' }}>{d.metricas_eco}</td>
+              </tr>
+            ))}
+            {historialDespliegues.length === 0 && (<tr><td colSpan="5" style={{ padding: '20px', textAlign: 'center', color: '#888' }}>No hay despliegues registrados.</td></tr>)}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }

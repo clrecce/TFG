@@ -22,8 +22,15 @@ engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 metadata = MetaData()
 
-# Tablas del DER
-proyectos = Table("proyectos", metadata, Column("id", Integer, primary_key=True), Column("nombre", String(255), nullable=False), Column("fecha_inicio", Date), Column("estado", String(50)))
+# Tablas del DER (AQUÍ CORREGIMOS LA RELACIÓN USUARIO -> PROYECTO)
+proyectos = Table("proyectos", metadata, 
+    Column("id", Integer, primary_key=True), 
+    Column("nombre", String(255), nullable=False), 
+    Column("fecha_inicio", Date), 
+    Column("estado", String(50)),
+    Column("usuario_id", Integer, default=1) # NUEVO: Clave foránea para cumplir el UML
+)
+
 requisitos = Table("requisitos", metadata, Column("id", Integer, primary_key=True), Column("descripcion", Text), Column("prioridad", String(50)), Column("kwh_estimado", Float), Column("proyecto_id", Integer))
 optimizaciones = Table("optimizaciones", metadata, Column("id", Integer, primary_key=True), Column("codigo_original", Text), Column("codigo_optimizado", Text), Column("emisiones_co2_kg", Float), Column("fecha", Date))
 configuracion = Table("configuracion", metadata, Column("id", Integer, primary_key=True), Column("nombre_completo", String(255)), Column("email", String(255)), Column("motor_ia", String(50)), Column("umbral_co2", Float))
@@ -34,7 +41,11 @@ despliegues = Table("despliegues", metadata, Column("id", Integer, primary_key=T
 reportes = Table("reportes", metadata, Column("id", Integer, primary_key=True), Column("fecha", Date), Column("estimacion_co2", Float), Column("comparacion", Text))
 
 # 3. Esquemas Pydantic
-class ProyectoCreate(BaseModel): nombre: str; estado: str
+class ProyectoCreate(BaseModel): 
+    nombre: str
+    estado: str
+    usuario_id: int = 1 # Valor por defecto para soportar la creación desde el frontend actual
+
 class EstadoProyecto(BaseModel): estado: str
 class CodigoRequest(BaseModel): codigo_ui: str; codigo_logica: str; lenguaje: str
 class RequisitoCreate(BaseModel): descripcion: str; prioridad: str; kwh_estimado: float; proyecto_id: int
@@ -89,7 +100,6 @@ def ejecutar_test_real(req: CodigoTestRequest, db: Session = Depends(get_db)):
     resultado_ok = False
     logs = ""
     
-    # EXTRA: Limpieza preventiva por si queda rastro de markdown
     codigo_limpio = req.codigo
     match = re.search(r"```[a-zA-Z]*\n?(.*?)```", codigo_limpio, re.DOTALL)
     if match:
@@ -151,7 +161,8 @@ def obtener_metricas_unificadas(db: Session = Depends(get_db)):
 # --- PROYECTOS Y REQUISITOS ---
 @app.post("/proyectos")
 def crear_proyecto(req: ProyectoCreate, db: Session = Depends(get_db)):
-    db.execute(proyectos.insert().values(nombre=req.nombre, fecha_inicio=datetime.datetime.now().date(), estado=req.estado))
+    # Al insertar, ahora se guarda el usuario_id vinculado
+    db.execute(proyectos.insert().values(nombre=req.nombre, fecha_inicio=datetime.datetime.now().date(), estado=req.estado, usuario_id=req.usuario_id))
     db.commit()
     return {"status": "ok"}
 
@@ -285,7 +296,6 @@ def optimizar_codigo(req: CodigoRequest, db: Session = Depends(get_db)):
         respuesta_ia = requests.post("http://localhost:11434/api/generate", json={"model": "gemma:2b", "prompt": prompt_ia, "stream": False})
         codigo_bruto = respuesta_ia.json().get("response", "")
         
-        # EXTRACTOR DE CÓDIGO PURO (RegEx)
         match = re.search(r"```[a-zA-Z]*\n?(.*?)```", codigo_bruto, re.DOTALL)
         if match:
             codigo_optimizado = match.group(1).strip()
@@ -301,7 +311,7 @@ def optimizar_codigo(req: CodigoRequest, db: Session = Depends(get_db)):
     db.execute(optimizaciones.insert().values(codigo_original=codigo_completo_original, codigo_optimizado=codigo_optimizado, emisiones_co2_kg=emisiones_kg, fecha=datetime.datetime.now().date()))
     
     config = db.execute(select(configuracion).where(configuracion.c.id == 1)).mappings().first()
-    umbral = 0.000000001 * config['umbral_co2'] if config else 0.05
+    umbral = config['umbral_co2'] if config else 0.05
     if emisiones_kg > umbral:
         db.execute(alertas.insert().values(severidad="Alta", mensaje=f"Pico detectado: La refactorización generó {emisiones_kg:.6f} kg CO2.", recomendacion="Revisar código full-stack enviado o umbral LLM.", resuelta=False, fecha=datetime.datetime.now().date()))
 
