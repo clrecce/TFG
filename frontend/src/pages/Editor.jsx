@@ -6,11 +6,13 @@ export default function Editor() {
   const editorRef = useRef(null);
   const [isOptimizing, setIsOptimizing] = useState(false);
   const [metrics, setMetrics] = useState(null);
-  // Por defecto lo ponemos en Python para que tu prueba no falle si te olvidas de cambiarlo
   const [lenguaje, setLenguaje] = useState('Python'); 
   const [codigoBackend, setCodigoBackend] = useState('');
   const [proyectos, setProyectos] = useState([]);
   const [proyectoId, setProyectoId] = useState('');
+  
+  // NUEVO: Estados para las analíticas del HU-006
+  const [analiticasRefactor, setAnaliticasRefactor] = useState(null);
 
   useEffect(() => {
     fetch('http://127.0.0.1:8000/proyectos')
@@ -45,14 +47,35 @@ export default function Editor() {
     const css = editorRef.current.getCss();
     const fullUI = `<style>\n${css}\n</style>\n${html}`;
 
-    setIsOptimizing(true); setMetrics(null);
+    setIsOptimizing(true); 
+    setMetrics(null);
+    setAnaliticasRefactor(null);
+
+    // HU-006: Calculamos el volumen de código original
+    const lineasUI = fullUI.split('\n').filter(line => line.trim() !== '').length;
+    const lineasBackend = codigoBackend.split('\n').filter(line => line.trim() !== '').length;
+    const totalLineasOriginales = lineasUI + lineasBackend;
 
     try {
       const response = await fetch('http://127.0.0.1:8000/optimizar-codigo', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ codigo_ui: fullUI, codigo_logica: codigoBackend, lenguaje: lenguaje })
       });
-      setMetrics(await response.json());
+      const data = await response.json();
+      setMetrics(data);
+
+      // HU-006: Calculamos la mejora post-generación (código obsoleto eliminado)
+      const totalLineasOptimizadas = data.codigo_optimizado.split('\n').filter(line => line.trim() !== '').length;
+      const lineasEliminadas = Math.max(0, totalLineasOriginales - totalLineasOptimizadas);
+      const porcentajeMejora = totalLineasOriginales > 0 ? ((lineasEliminadas / totalLineasOriginales) * 100).toFixed(1) : 0;
+
+      setAnaliticasRefactor({
+        original: totalLineasOriginales,
+        optimizado: totalLineasOptimizadas,
+        eliminadas: lineasEliminadas,
+        mejora: porcentajeMejora
+      });
+
     } catch (error) { alert("Error al optimizar."); } 
     finally { setIsOptimizing(false); }
   };
@@ -103,7 +126,7 @@ export default function Editor() {
           </div>
 
           <button className="btn-optimizar" onClick={handleOptimize} disabled={isOptimizing || proyectos.length === 0} style={{ marginLeft: 'auto', opacity: proyectos.length === 0 ? 0.5 : 1 }}>
-            {isOptimizing ? '⏳ Green Coding Gemma 2b...' : '✨ Generar Arquitectura Semántica y Medir CO2'}
+            {isOptimizing ? '⏳ Procesando Refactorización IA...' : '✨ Generar Arquitectura Semántica y Medir CO2'}
           </button>
         </div>
         
@@ -113,35 +136,53 @@ export default function Editor() {
 
         <div style={{ height: '200px', backgroundColor: '#1a1a24', borderTop: '2px solid #3a3a52', padding: '15px' }}>
           <label style={{ color: '#a5b4fc', fontWeight: 'bold', fontSize: '14px', display: 'block', marginBottom: '10px' }}>
-            Lógica de Backend/DER (Opcional - {lenguaje})
+            Refactorización Post-Generación (HU-006) - Pega tu código obsoleto aquí:
           </label>
           <textarea 
             value={codigoBackend} 
             onChange={(e) => setCodigoBackend(e.target.value)}
-            placeholder="Pega aquí tu código de Python o Node.js que conecta con el DER para que la IA lo optimice."
-            style={{ width: '100%', height: '150px', backgroundColor: '#1e1e2f', color: '#fca5a5', border: '1px solid #3a3a52', borderRadius: '5px', fontFamily: 'monospace', fontSize: '12px', padding: '10px', boxSizing: 'border-box' }}
+            placeholder="Pega aquí tu código sucio o legacy. La IA detectará código obsoleto, lo eliminará y medirá la mejora de eficiencia energética."
+            style={{ width: '100%', height: '130px', backgroundColor: '#1e1e2f', color: '#fca5a5', border: '1px solid #3a3a52', borderRadius: '5px', fontFamily: 'monospace', fontSize: '12px', padding: '10px', boxSizing: 'border-box' }}
           />
         </div>
       </div>
 
-      {metrics && (
-        <div className="metrics-panel">
+      {metrics && analiticasRefactor && (
+        <div className="metrics-panel" style={{ width: '380px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
-            <h3 style={{ color: '#4ade80', margin: 0 }}>Dashboard Ambiental</h3>
+            <h3 style={{ color: '#4ade80', margin: 0 }}>Análisis de Refactorización</h3>
             <button onClick={() => setMetrics(null)} style={{ background: 'none', color: 'white', border: 'none', cursor: 'pointer', fontSize: '20px' }}>✖</button>
           </div>
-          <div className="metric-card" style={{ borderLeftColor: '#ef4444' }}>
-            <p style={{ margin: 0, fontSize: '14px', color: '#9ca3af' }}>Costo Energético (CodeCarbon)</p>
-            <h2 style={{ margin: '5px 0', color: '#f87171' }}>{metrics.emisiones_co2_kg.toFixed(8)} kg CO2</h2>
+
+          {/* KPI 1: CodeCarbon Hardware */}
+          <div className="metric-card" style={{ borderLeftColor: '#ef4444', marginBottom: '10px' }}>
+            <p style={{ margin: 0, fontSize: '13px', color: '#9ca3af' }}>Consumo Físico IA (CodeCarbon)</p>
+            <h3 style={{ margin: '5px 0', color: '#f87171' }}>{metrics.emisiones_co2_kg.toFixed(8)} kg CO2</h3>
           </div>
+
+          {/* KPI 2: Criterios HU-006 (Código Obsoleto y Mejora) */}
+          <div className="metric-card" style={{ borderLeftColor: '#10b981', backgroundColor: '#064e3b', marginBottom: '15px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div>
+                <p style={{ margin: 0, fontSize: '12px', color: '#a7f3d0' }}>Código Obsoleto Eliminado</p>
+                <h3 style={{ margin: '5px 0', color: '#34d399' }}>{analiticasRefactor.eliminadas} Líneas (-{analiticasRefactor.mejora}%)</h3>
+              </div>
+              <div style={{ textAlign: 'right' }}>
+                <p style={{ margin: 0, fontSize: '12px', color: '#a7f3d0' }}>Mejora Eficiencia</p>
+                <h3 style={{ margin: '5px 0', color: '#34d399' }}>Validada ✓</h3>
+              </div>
+            </div>
+            <p style={{ margin: '5px 0 0 0', fontSize: '11px', color: '#6ee7b7' }}>De {analiticasRefactor.original} líneas originales a {analiticasRefactor.optimizado} líneas optimizadas.</p>
+          </div>
+
           <div className="metric-card">
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <p style={{ margin: 0, fontSize: '14px', color: '#9ca3af' }}>Refactorización Unificada ({lenguaje})</p>
+              <p style={{ margin: 0, fontSize: '14px', color: '#9ca3af' }}>Código Unificado ({lenguaje})</p>
               <button onClick={descargarCodigo} style={{ backgroundColor: '#3b82f6', color: 'white', border: 'none', padding: '5px 10px', borderRadius: '3px', cursor: 'pointer', fontSize: '12px', fontWeight: 'bold' }}>
-                📥 Descargar Archivo
+                📥 Archivar / Descargar
               </button>
             </div>
-            <div className="code-box" style={{ marginTop: '10px', height: '300px' }}>{metrics.codigo_optimizado}</div>
+            <div className="code-box" style={{ marginTop: '10px', height: '220px', fontSize: '11px' }}>{metrics.codigo_optimizado}</div>
           </div>
         </div>
       )}

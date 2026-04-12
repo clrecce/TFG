@@ -301,7 +301,7 @@ def optimizar_codigo(req: CodigoRequest, db: Session = Depends(get_db)):
     db.execute(optimizaciones.insert().values(codigo_original=codigo_completo_original, codigo_optimizado=codigo_optimizado, emisiones_co2_kg=emisiones_kg, fecha=datetime.datetime.now().date()))
     
     config = db.execute(select(configuracion).where(configuracion.c.id == 1)).mappings().first()
-    umbral = config['umbral_co2'] if config else 0.05
+    umbral = 0.000000001 * config['umbral_co2'] if config else 0.05
     if emisiones_kg > umbral:
         db.execute(alertas.insert().values(severidad="Alta", mensaje=f"Pico detectado: La refactorización generó {emisiones_kg:.6f} kg CO2.", recomendacion="Revisar código full-stack enviado o umbral LLM.", resuelta=False, fecha=datetime.datetime.now().date()))
 

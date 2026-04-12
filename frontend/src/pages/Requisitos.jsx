@@ -3,105 +3,196 @@ import { useState, useEffect } from 'react';
 export default function Requisitos() {
   const [requisitos, setRequisitos] = useState([]);
   const [proyectos, setProyectos] = useState([]);
-  const [formData, setFormData] = useState({ descripcion: '', prioridad: 'Alta', kwh_estimado: 0, proyecto_id: '' });
-  const [estimando, setEstimando] = useState(false);
+  
+  // Estados del Formulario
+  const [proyectoId, setProyectoId] = useState('');
+  const [descripcion, setDescripcion] = useState('');
+  const [prioridad, setPrioridad] = useState('Media');
+  
+  // Estados de Estimación Ambiental (HU-001)
+  const [kwhEstimado, setKwhEstimado] = useState(0);
+  const [alertaAmbiental, setAlertaAmbiental] = useState('');
 
   useEffect(() => {
-    fetchRequisitos();
-    fetchProyectos();
+    fetchData();
   }, []);
 
-  const fetchRequisitos = async () => {
-    const res = await fetch('http://127.0.0.1:8000/requisitos');
-    setRequisitos(await res.json());
-  };
-
-  const fetchProyectos = async () => {
-    const res = await fetch('http://127.0.0.1:8000/proyectos');
-    const data = await res.json();
-    setProyectos(data);
-    if (data.length > 0) setFormData(prev => ({ ...prev, proyecto_id: data[0].id }));
-  };
-
-  const estimarConIA = () => {
-    if (!formData.descripcion) return alert("Por favor, ingresa una descripción primero.");
-    setEstimando(true);
-    setTimeout(() => {
-      let estimado = 0;
-      if (formData.prioridad === 'Alta') estimado = 8.5 + (Math.random() * 2);
-      if (formData.prioridad === 'Media') estimado = 5.0 + (Math.random() * 1.5);
-      if (formData.prioridad === 'Baja') estimado = 2.0 + (Math.random() * 1);
+  const fetchData = async () => {
+    try {
+      const [resReq, resProj] = await Promise.all([
+        fetch('http://127.0.0.1:8000/requisitos'),
+        fetch('http://127.0.0.1:8000/proyectos')
+      ]);
+      setRequisitos(await resReq.json());
       
-      setFormData({ ...formData, kwh_estimado: parseFloat(estimado.toFixed(2)) });
-      setEstimando(false);
-    }, 1500);
+      const dataProj = await resProj.json();
+      setProyectos(dataProj);
+      if (dataProj.length > 0) setProyectoId(dataProj[0].id);
+    } catch (error) {
+      console.error("Error al cargar datos:", error);
+    }
   };
+
+  // MOTOR HEURÍSTICO DE ESTIMACIÓN (Responde a la Duda A y B)
+  const analizarImpactoAmbiental = (texto) => {
+    setDescripcion(texto);
+    
+    // 1. VALIDACIÓN DE FALTA DE INFORMACIÓN (Responde a la Duda B)
+    if (texto.trim().length < 20) {
+      setAlertaAmbiental('⚠️ Falta contexto técnico. La descripción es muy corta para estimar el impacto ambiental (Mín. 20 caracteres).');
+      setKwhEstimado(0);
+      return;
+    }
+    
+    setAlertaAmbiental(''); // Limpiamos la alerta si cumple la longitud
+
+    // 2. ALGORITMO DE ESTIMACIÓN (Responde a la Duda A)
+    let consumoBase = 1.5; // Todo requerimiento gasta un mínimo de 1.5 kWh en horas de desarrollo/test
+    
+    const textoLower = texto.toLowerCase();
+    
+    // Penalizaciones por complejidad arquitectónica (Simulación de NLP)
+    if (textoLower.includes('video') || textoLower.includes('streaming') || textoLower.includes('imagen')) consumoBase += 15.0;
+    if (textoLower.includes('inteligencia artificial') || textoLower.includes('ia') || textoLower.includes('machine learning')) consumoBase += 25.0;
+    if (textoLower.includes('tiempo real') || textoLower.includes('socket')) consumoBase += 8.0;
+    if (textoLower.includes('base de datos') || textoLower.includes('crud') || textoLower.includes('reporte')) consumoBase += 3.5;
+    if (textoLower.includes('email') || textoLower.includes('notificación')) consumoBase += 1.0;
+
+    // Multiplicador por nivel de prioridad
+    let multiplicadorPrioridad = 1;
+    if (prioridad === 'Alta') multiplicadorPrioridad = 1.5; // Alta prioridad suele implicar código menos optimizado por el apuro
+    if (prioridad === 'Baja') multiplicadorPrioridad = 0.8;
+
+    // Fórmula final
+    const calculoFinal = consumoBase * multiplicadorPrioridad;
+    setKwhEstimado(parseFloat(calculoFinal.toFixed(2)));
+  };
+
+  // Efecto para recalcular si cambian la prioridad después de escribir
+  useEffect(() => {
+    if (descripcion.length >= 20) {
+      analizarImpactoAmbiental(descripcion);
+    }
+  }, [prioridad]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (formData.kwh_estimado === 0) return alert("Debes estimar el consumo con la IA antes de guardar.");
-    
-    await fetch('http://127.0.0.1:8000/requisitos', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(formData)
-    });
-    setFormData({ ...formData, descripcion: '', kwh_estimado: 0 }); 
-    fetchRequisitos(); 
+    if (kwhEstimado === 0) return alert("No se puede guardar un requerimiento sin información suficiente para la estimación ambiental.");
+
+    try {
+      await fetch('http://127.0.0.1:8000/requisitos', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          descripcion,
+          prioridad,
+          kwh_estimado: kwhEstimado,
+          proyecto_id: parseInt(proyectoId)
+        })
+      });
+      setDescripcion('');
+      setKwhEstimado(0);
+      fetchData();
+    } catch (error) {
+      console.error("Error guardando requisito:", error);
+    }
   };
 
-  // NUEVO: Función para eliminar requisito
-  const handleDelete = async (id) => {
-    if (!window.confirm("¿Eliminar este requisito de forma permanente?")) return;
-    try {
-      await fetch(`http://127.0.0.1:8000/requisitos/${id}`, { method: 'DELETE' });
-      fetchRequisitos();
-    } catch (error) { console.error("Error eliminando:", error); }
+  const eliminarRequisito = async (id) => {
+    if (window.confirm('¿Eliminar este requisito?')) {
+      try {
+        await fetch(`http://127.0.0.1:8000/requisitos/${id}`, { method: 'DELETE' });
+        fetchData();
+      } catch (error) { console.error(error); }
+    }
   };
 
   return (
-    <div style={{ padding: '30px', color: 'white', maxWidth: '900px', margin: '0 auto' }}>
-      <h2 style={{ color: '#4ade80' }}>📄 Recopilación de Requisitos con Métricas Energéticas</h2>
-      
-      <div style={{ backgroundColor: '#252536', padding: '20px', borderRadius: '8px', border: '1px solid #3a3a52' }}>
-        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+    <div style={{ padding: '30px', color: 'white', maxWidth: '1000px', margin: '0 auto' }}>
+      <h2 style={{ color: '#4ade80' }}>📝 Recopilación de Requisitos (Green IT)</h2>
+      <p style={{ color: '#a5b4fc', marginBottom: '30px' }}>Ingresa las historias de usuario. El sistema estimará automáticamente la huella energética proyectada de la arquitectura.</p>
+
+      {/* FORMULARIO DE INGRESO (HU-001) */}
+      <div style={{ backgroundColor: '#252536', padding: '25px', borderRadius: '8px', border: '1px solid #3a3a52', marginBottom: '40px' }}>
+        <form onSubmit={handleSubmit}>
           
-          <label style={{ fontWeight: 'bold', color: '#a5b4fc' }}>Vincular al Proyecto *</label>
-          <select required value={formData.proyecto_id} onChange={(e) => setFormData({...formData, proyecto_id: parseInt(e.target.value)})} style={{ padding: '10px', borderRadius: '5px', backgroundColor: '#1e1e2f', color: 'white', border: '1px solid #3a3a52' }}>
-            {proyectos.map(p => <option key={p.id} value={p.id}>{p.nombre}</option>)}
-          </select>
-
-          <label style={{ fontWeight: 'bold', color: '#a5b4fc' }}>Descripción del Requisito *</label>
-          <textarea required rows="3" style={{ padding: '10px', borderRadius: '5px', backgroundColor: '#1e1e2f', color: 'white', border: '1px solid #3a3a52' }} value={formData.descripcion} onChange={(e) => setFormData({...formData, descripcion: e.target.value})} />
-
-          <div style={{ display: 'flex', gap: '20px', alignItems: 'flex-end' }}>
-            <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-              <label style={{ fontWeight: 'bold', color: '#a5b4fc', marginBottom: '5px' }}>Prioridad *</label>
-              <select value={formData.prioridad} onChange={(e) => setFormData({...formData, prioridad: e.target.value, kwh_estimado: 0})} style={{ padding: '10px', borderRadius: '5px', backgroundColor: '#1e1e2f', color: 'white', border: '1px solid #3a3a52' }}>
-                <option value="Alta">Alta</option><option value="Media">Media</option><option value="Baja">Baja</option>
+          <div style={{ display: 'flex', gap: '20px', marginBottom: '15px' }}>
+            <div style={{ flex: 1 }}>
+              <label style={{ display: 'block', marginBottom: '5px', color: '#a5b4fc', fontWeight: 'bold' }}>Proyecto Vinculado</label>
+              <select value={proyectoId} onChange={(e) => setProyectoId(e.target.value)} style={{ width: '100%', padding: '10px', borderRadius: '5px', backgroundColor: '#1e1e2f', color: 'white', border: '1px solid #3a3a52' }} required>
+                {proyectos.map(p => <option key={p.id} value={p.id}>{p.nombre}</option>)}
+                {proyectos.length === 0 && <option value="">Debes crear un proyecto primero</option>}
               </select>
             </div>
-
-            <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-              <label style={{ fontWeight: 'bold', color: '#a5b4fc', marginBottom: '5px' }}>Estimación Inicial (kWh) *</label>
-              <input type="number" readOnly value={formData.kwh_estimado} style={{ padding: '10px', borderRadius: '5px', backgroundColor: '#1a1a24', color: '#f87171', border: '1px solid #3a3a52', cursor: 'not-allowed', fontWeight: 'bold' }} />
+            
+            <div style={{ flex: 1 }}>
+              <label style={{ display: 'block', marginBottom: '5px', color: '#a5b4fc', fontWeight: 'bold' }}>Prioridad de Ejecución</label>
+              <select value={prioridad} onChange={(e) => setPrioridad(e.target.value)} style={{ width: '100%', padding: '10px', borderRadius: '5px', backgroundColor: '#1e1e2f', color: 'white', border: '1px solid #3a3a52' }}>
+                <option value="Baja">Baja (Desarrollo Optimizado)</option>
+                <option value="Media">Media (Estándar)</option>
+                <option value="Alta">Alta (Desarrollo Acelerado)</option>
+              </select>
             </div>
           </div>
 
-          <button type="button" onClick={estimarConIA} disabled={estimando} style={{ padding: '12px', backgroundColor: '#8b5cf6', color: 'white', fontWeight: 'bold', border: 'none', borderRadius: '5px', cursor: 'pointer' }}>
-            {estimando ? '⏳ Analizando métricas...' : '✨ Integrar Métricas IA (Auto-sugerencias)'}
-          </button>
+          <div style={{ marginBottom: '15px' }}>
+            <label style={{ display: 'block', marginBottom: '5px', color: '#a5b4fc', fontWeight: 'bold' }}>Descripción Técnica de la Historia de Usuario</label>
+            <textarea 
+              value={descripcion} 
+              onChange={(e) => analizarImpactoAmbiental(e.target.value)}
+              placeholder="Ej: El sistema debe permitir a los usuarios subir un video en tiempo real y guardarlo en la base de datos..."
+              style={{ width: '100%', height: '100px', padding: '10px', borderRadius: '5px', backgroundColor: '#1e1e2f', color: 'white', border: '1px solid #3a3a52', boxSizing: 'border-box' }}
+              required
+            />
+          </div>
 
-          <button type="submit" style={{ padding: '12px', backgroundColor: '#4ade80', color: '#1e1e2f', fontWeight: 'bold', border: 'none', borderRadius: '5px', cursor: 'pointer' }}>
-            ✓ Validar y Agregar
+          {/* PANEL DE ESTIMACIÓN Y ALERTAS */}
+          <div style={{ backgroundColor: '#1a1a24', padding: '15px', borderRadius: '5px', borderLeft: alertaAmbiental ? '4px solid #f59e0b' : '4px solid #4ade80', marginBottom: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div>
+              <span style={{ color: '#9ca3af', fontSize: '13px', display: 'block' }}>Estimación Proyectada por el Analizador:</span>
+              {alertaAmbiental ? (
+                <span style={{ color: '#f59e0b', fontWeight: 'bold', fontSize: '14px' }}>{alertaAmbiental}</span>
+              ) : (
+                <span style={{ color: '#4ade80', fontWeight: 'bold', fontSize: '18px' }}>Estructura válida. Consumo estimado:</span>
+              )}
+            </div>
+            <div style={{ textAlign: 'right' }}>
+              <h2 style={{ margin: 0, color: alertaAmbiental ? '#6b7280' : '#fbbf24', fontSize: '32px' }}>{kwhEstimado} <small style={{ fontSize: '16px' }}>kWh</small></h2>
+            </div>
+          </div>
+
+          <button type="submit" disabled={kwhEstimado === 0 || proyectos.length === 0} style={{ padding: '12px 25px', backgroundColor: kwhEstimado === 0 ? '#4b5563' : '#8b5cf6', color: 'white', border: 'none', borderRadius: '5px', cursor: kwhEstimado === 0 ? 'not-allowed' : 'pointer', fontWeight: 'bold', width: '100%' }}>
+            ➕ Guardar Requisito en Backlog
           </button>
         </form>
       </div>
 
-      <h3 style={{ marginTop: '30px', color: '#a5b4fc' }}>📊 Vista Previa</h3>
-      <table style={{ width: '100%', borderCollapse: 'collapse', backgroundColor: '#252536', borderRadius: '8px', overflow: 'hidden' }}>
-        <thead><tr style={{ backgroundColor: '#1a1a24', color: '#4ade80', textAlign: 'left' }}><th style={{ padding: '10px' }}>ID</th><th style={{ padding: '10px' }}>Proyecto</th><th style={{ padding: '10px' }}>Descripción</th><th style={{ padding: '10px' }}>kWh</th><th style={{ padding: '10px', textAlign:'center' }}>Acciones</th></tr></thead>
+      {/* TABLA DE REQUISITOS */}
+      <h3 style={{ color: '#a5b4fc', borderBottom: '1px solid #3a3a52', paddingBottom: '10px' }}>📋 Backlog de Requisitos del Sistema</h3>
+      <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '15px', backgroundColor: '#252536', borderRadius: '8px', overflow: 'hidden' }}>
+        <thead>
+          <tr style={{ backgroundColor: '#1a1a24', color: '#4ade80', textAlign: 'left' }}>
+            <th style={{ padding: '15px' }}>ID</th>
+            <th style={{ padding: '15px' }}>Descripción</th>
+            <th style={{ padding: '15px' }}>Prioridad</th>
+            <th style={{ padding: '15px' }}>Impacto Est. (kWh)</th>
+            <th style={{ padding: '15px', textAlign: 'center' }}>Acciones</th>
+          </tr>
+        </thead>
         <tbody>
-          {requisitos.map((req) => (<tr key={req.id} style={{ borderTop: '1px solid #3a3a52' }}><td style={{ padding: '10px' }}>REQ-{req.id}</td><td style={{ padding: '10px', color: '#a5b4fc' }}>PRJ-{req.proyecto_id}</td><td style={{ padding: '10px' }}>{req.descripcion}</td><td style={{ padding: '10px', color: '#f87171', fontWeight: 'bold' }}>{req.kwh_estimado}</td><td style={{ padding: '10px', textAlign: 'center' }}><button onClick={() => handleDelete(req.id)} style={{ background: 'transparent', border: 'none', color: '#ef4444', cursor: 'pointer', fontSize: '16px' }} title="Eliminar Requisito">🗑️</button></td></tr>))}
+          {requisitos.map((r) => (
+            <tr key={r.id} style={{ borderTop: '1px solid #3a3a52' }}>
+              <td style={{ padding: '15px', color: '#a5b4fc', fontWeight: 'bold' }}>REQ-{r.id}</td>
+              <td style={{ padding: '15px', fontSize: '14px' }}>{r.descripcion}</td>
+              <td style={{ padding: '15px' }}>
+                <span style={{ color: r.prioridad === 'Alta' ? '#ef4444' : r.prioridad === 'Media' ? '#f59e0b' : '#34d399', fontWeight: 'bold' }}>{r.prioridad}</span>
+              </td>
+              <td style={{ padding: '15px', color: '#fbbf24', fontWeight: 'bold' }}>{r.kwh_estimado}</td>
+              <td style={{ padding: '15px', textAlign: 'center' }}>
+                <button onClick={() => eliminarRequisito(r.id)} style={{ backgroundColor: '#ef4444', color: 'white', border: 'none', padding: '5px 10px', borderRadius: '3px', cursor: 'pointer' }}>Eliminar</button>
+              </td>
+            </tr>
+          ))}
           {requisitos.length === 0 && (<tr><td colSpan="5" style={{ padding: '20px', textAlign: 'center', color: '#888' }}>No hay requisitos cargados.</td></tr>)}
         </tbody>
       </table>
