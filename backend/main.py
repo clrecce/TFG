@@ -22,13 +22,13 @@ engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 metadata = MetaData()
 
-# Tablas del DER (AQUÍ CORREGIMOS LA RELACIÓN USUARIO -> PROYECTO)
+# Tablas del DER
 proyectos = Table("proyectos", metadata, 
     Column("id", Integer, primary_key=True), 
     Column("nombre", String(255), nullable=False), 
     Column("fecha_inicio", Date), 
     Column("estado", String(50)),
-    Column("usuario_id", Integer, default=1) # NUEVO: Clave foránea para cumplir el UML
+    Column("usuario_id", Integer, default=1) 
 )
 
 requisitos = Table("requisitos", metadata, Column("id", Integer, primary_key=True), Column("descripcion", Text), Column("prioridad", String(50)), Column("kwh_estimado", Float), Column("proyecto_id", Integer))
@@ -44,7 +44,7 @@ reportes = Table("reportes", metadata, Column("id", Integer, primary_key=True), 
 class ProyectoCreate(BaseModel): 
     nombre: str
     estado: str
-    usuario_id: int = 1 # Valor por defecto para soportar la creación desde el frontend actual
+    usuario_id: int = 1 
 
 class EstadoProyecto(BaseModel): estado: str
 class CodigoRequest(BaseModel): codigo_ui: str; codigo_logica: str; lenguaje: str
@@ -161,7 +161,6 @@ def obtener_metricas_unificadas(db: Session = Depends(get_db)):
 # --- PROYECTOS Y REQUISITOS ---
 @app.post("/proyectos")
 def crear_proyecto(req: ProyectoCreate, db: Session = Depends(get_db)):
-    # Al insertar, ahora se guarda el usuario_id vinculado
     db.execute(proyectos.insert().values(nombre=req.nombre, fecha_inicio=datetime.datetime.now().date(), estado=req.estado, usuario_id=req.usuario_id))
     db.commit()
     return {"status": "ok"}
@@ -281,17 +280,21 @@ def resolver_alerta(alerta_id: int, db: Session = Depends(get_db)):
 def optimizar_codigo(req: CodigoRequest, db: Session = Depends(get_db)):
     tracker = EmissionsTracker(project_name="ecodev_ia", measure_power_secs=1)
     tracker.start()
+    
+    # NUEVO: Prompt actualizado con bloqueo de librerías externas para evitar errores en CI/CD
     prompt_ia = (
         "Actúa como un desarrollador senior experto en Green Coding y refactorización semántica.\n"
         "Te proporcionaré un diseño Frontend (HTML/CSS) y una lógica Backend (Código Fuente).\n"
         f"Debes optimizar el código completo basándote en el lenguaje seleccionado: {req.lenguaje}.\n\n"
         "Reglas:\n"
         "1. Optimiza el Frontend para accesibilidad, SEO y renderizado rápido del DOM.\n"
-        "2. Optimiza la Lógica Backend usando mejores prácticas de Green Coding para {req.lenguaje}.\n"
-        "3. Devuelve SOLO el código unificado y optimizado, sin explicaciones.\n\n"
+        f"2. Optimiza la Lógica Backend usando mejores prácticas de Green Coding para {req.lenguaje}.\n"
+        f"3. IMPORTANTE: NO importes ni utilices librerías externas de terceros (como Flask, Django, pandas, etc.) que no estén presentes en el código original. Usa estrictamente la biblioteca estándar (built-in) de {req.lenguaje} para asegurar que el script se ejecute de forma independiente sin dependencias adicionales.\n"
+        "4. Devuelve SOLO el código unificado y optimizado, sin explicaciones.\n\n"
         f"--- DISEÑO FRONTEND ---\n{req.codigo_ui}\n\n"
         f"--- LÓGICA BACKEND ({req.lenguaje}) ---\n{req.codigo_logica}"
     )
+    
     try:
         respuesta_ia = requests.post("http://localhost:11434/api/generate", json={"model": "gemma:2b", "prompt": prompt_ia, "stream": False})
         codigo_bruto = respuesta_ia.json().get("response", "")
