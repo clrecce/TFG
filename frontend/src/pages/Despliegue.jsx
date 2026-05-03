@@ -4,6 +4,10 @@ export default function Despliegue() {
   const [estado, setEstado] = useState('pendiente'); 
   const [proyectos, setProyectos] = useState([]);
   const [proyectoId, setProyectoId] = useState('');
+  
+  // NUEVO: Estado para que el DevOps elija qué entorno virtual levantar
+  const [lenguajeTest, setLenguajeTest] = useState('python'); 
+  
   const [historialDespliegues, setHistorialDespliegues] = useState([]); 
   const [logs, setLogs] = useState(""); 
 
@@ -29,7 +33,7 @@ export default function Despliegue() {
   const ejecutarPruebaReal = async () => {
     if (!proyectoId) return alert("No hay proyectos listos para probar.");
     setEstado('testeando');
-    setLogs("Iniciando compilador virtual... analizando código fuente y validando métricas eco-eficientes...\n");
+    setLogs(`Iniciando pipeline virtual para entorno [${lenguajeTest.toUpperCase()}]... analizando código y validando métricas eco-eficientes...\n`);
     
     try {
       const resOpt = await fetch('http://127.0.0.1:8000/optimizaciones');
@@ -46,7 +50,7 @@ export default function Despliegue() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           codigo: ultimaOpt ? ultimaOpt.codigo_optimizado : "",
-          lenguaje: 'python', 
+          lenguaje: lenguajeTest, // AHORA TOMA EL VALOR DEL SELECTOR
           proyecto_id: parseInt(proyectoId)
         })
       });
@@ -95,12 +99,23 @@ export default function Despliegue() {
       <h2 style={{ color: '#4ade80' }}>🚀 Pipeline de CI/CD: Validación y Despliegue</h2>
       <p style={{ color: '#a5b4fc', marginBottom: '30px' }}>Control de calidad eco-eficiente para asegurar que solo el código sostenible llegue a la nube.</p>
       
-      <div style={{ marginBottom: '20px' }}>
-        <label style={{ display: 'block', marginBottom: '5px', color: '#a5b4fc', fontWeight: 'bold' }}>Proyecto a Desplegar:</label>
-        <select value={proyectoId} onChange={(e) => setProyectoId(e.target.value)} style={{ width: '100%', padding: '10px', borderRadius: '5px', backgroundColor: '#1e1e2f', color: 'white', border: '1px solid #3a3a52' }}>
-          {proyectos.map(p => <option key={p.id} value={p.id}>{p.nombre} ({p.estado})</option>)}
-          {proyectos.length === 0 && <option value="">No hay proyectos pendientes</option>}
-        </select>
+      {/* NUEVO CONTENEDOR DE SELECTORES */}
+      <div style={{ display: 'flex', gap: '15px', marginBottom: '20px', flexWrap: 'wrap' }}>
+        <div style={{ flex: '1 1 250px' }}>
+          <label style={{ display: 'block', marginBottom: '5px', color: '#a5b4fc', fontWeight: 'bold' }}>Proyecto a Desplegar:</label>
+          <select value={proyectoId} onChange={(e) => setProyectoId(e.target.value)} style={{ width: '100%', padding: '10px', borderRadius: '5px', backgroundColor: '#1e1e2f', color: 'white', border: '1px solid #3a3a52' }}>
+            {proyectos.map(p => <option key={p.id} value={p.id}>{p.nombre} ({p.estado})</option>)}
+            {proyectos.length === 0 && <option value="">No hay proyectos pendientes</option>}
+          </select>
+        </div>
+        
+        <div style={{ flex: '1 1 250px' }}>
+          <label style={{ display: 'block', marginBottom: '5px', color: '#a5b4fc', fontWeight: 'bold' }}>Entorno de Pruebas (Pipeline):</label>
+          <select value={lenguajeTest} onChange={(e) => setLenguajeTest(e.target.value)} style={{ width: '100%', padding: '10px', borderRadius: '5px', backgroundColor: '#1e1e2f', color: 'white', border: '1px solid #3a3a52' }}>
+            <option value="python">Python (Lógica Back-End)</option>
+            <option value="html">HTML/JS (Front-End Estructural)</option>
+          </select>
+        </div>
       </div>
 
       <div style={{ backgroundColor: '#252536', padding: '20px', borderRadius: '8px', border: '1px solid #3a3a52', marginBottom: '40px' }}>
@@ -123,7 +138,6 @@ export default function Despliegue() {
 
       <h3 style={{ color: '#a5b4fc', borderBottom: '1px solid #3a3a52', paddingBottom: '10px' }}>🗄️ Historial de Despliegues Cloud Certificados</h3>
       
-      {/* SOLUCIÓN DUDA 2: CONTENEDOR CON SCROLL HORIZONTAL (overflowX: auto) */}
       <div style={{ overflowX: 'auto', borderRadius: '8px', border: '1px solid #3a3a52', marginTop: '15px' }}>
         <table style={{ width: '100%', borderCollapse: 'collapse', backgroundColor: '#252536', minWidth: '700px' }}>
           <thead>

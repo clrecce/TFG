@@ -70,7 +70,8 @@ export default function Editor() {
 
   const descargarCodigo = () => {
     if (!metrics) return;
-    let extension = lenguaje === 'Node.js' ? 'js' : lenguaje === 'Python' ? 'py' : 'html';
+    // Se elimina la lógica de Node.js, quedando solo Python y HTML
+    let extension = lenguaje === 'Python' ? 'py' : 'html';
     const blob = new Blob([metrics.codigo_optimizado], { type: 'text/plain' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -85,7 +86,6 @@ export default function Editor() {
         <div id="blocks" style={{ flexGrow: 1, overflowY: 'auto' }}></div>
       </div>
 
-      {/* SOLUCIÓN DUDA 3: overflowY 'auto' en la columna principal para poder bajar en móvil */}
       <div style={{ display: 'flex', flexDirection: 'column', flexGrow: 1, height: '100%', overflowY: 'auto' }}>
         
         <div className="header-actions" style={{ display: 'flex', gap: '15px', alignItems: 'center', flexWrap: 'wrap', flexShrink: 0, padding: '15px' }}>
@@ -98,7 +98,6 @@ export default function Editor() {
 
           <select value={lenguaje} onChange={(e) => setLenguaje(e.target.value)} style={{ padding: '8px', borderRadius: '5px', backgroundColor: '#2d2d44', color: 'white', border: '1px solid #3a3a52', flexGrow: 1, minWidth: '120px' }}>
             <option value="Python">Python</option>
-            <option value="Node.js">Node.js</option>
             <option value="HTML/CSS">HTML/CSS/JS</option>
           </select>
 
@@ -107,12 +106,10 @@ export default function Editor() {
           </button>
         </div>
         
-        {/* flexShrink 0 evita que el lienzo se aplaste, asegurando que ocupe al menos 400px */}
         <div style={{ position: 'relative', width: '100%', backgroundColor: '#ffffff', height: '400px', flexShrink: 0 }}>
           <div id="editor-canvas" style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}></div>
         </div>
 
-        {/* El panel inferior del HU-006, ahora accesible con scroll en el celular */}
         <div style={{ backgroundColor: '#1a1a24', borderTop: '2px solid #3a3a52', padding: '15px', flexShrink: 0 }}>
           <label style={{ color: '#a5b4fc', fontWeight: 'bold', fontSize: '14px', display: 'block', marginBottom: '10px' }}>
             Refactorización Manual (HU-006) - Pega tu código legacy aquí:
