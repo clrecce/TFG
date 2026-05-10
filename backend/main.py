@@ -187,7 +187,7 @@ def eliminar_proyecto(proyecto_id: int, db: Session = Depends(get_db)):
 @app.post("/requisitos")
 def crear_requisito(req: RequisitoCreate, db: Session = Depends(get_db)):
     db.execute(requisitos.insert().values(descripcion=req.descripcion, prioridad=req.prioridad, kwh_estimado=req.kwh_estimado, proyecto_id=req.proyecto_id))
-    db.execute(update(proyectos).where(proyectos.c.id == req.proyecto_id, proyectos.c.estado == "En Planificación").values(estado="En Desarrollo"))
+    db.execute(update(proyectos).where(proyectos.c.id == req.proyecto_id).values(estado="En Desarrollo"))
     db.commit()
     return {"status": "ok"}
 
@@ -281,19 +281,28 @@ def optimizar_codigo(req: CodigoRequest, db: Session = Depends(get_db)):
     tracker = EmissionsTracker(project_name="ecodev_ia", measure_power_secs=1)
     tracker.start()
     
-    # NUEVO: Prompt actualizado con bloqueo de librerías externas para evitar errores en CI/CD
-    prompt_ia = (
-        "Actúa como un desarrollador senior experto en Green Coding y refactorización semántica.\n"
-        "Te proporcionaré un diseño Frontend (HTML/CSS) y una lógica Backend (Código Fuente).\n"
-        f"Debes optimizar el código completo basándote en el lenguaje seleccionado: {req.lenguaje}.\n\n"
-        "Reglas:\n"
-        "1. Optimiza el Frontend para accesibilidad, SEO y renderizado rápido del DOM.\n"
-        f"2. Optimiza la Lógica Backend usando mejores prácticas de Green Coding para {req.lenguaje}.\n"
-        f"3. IMPORTANTE: NO importes ni utilices librerías externas de terceros (como Flask, Django, pandas, etc.) que no estén presentes en el código original. Usa estrictamente la biblioteca estándar (built-in) de {req.lenguaje} para asegurar que el script se ejecute de forma independiente sin dependencias adicionales.\n"
-        "4. Devuelve SOLO el código unificado y optimizado, sin explicaciones.\n\n"
-        f"--- DISEÑO FRONTEND ---\n{req.codigo_ui}\n\n"
-        f"--- LÓGICA BACKEND ({req.lenguaje}) ---\n{req.codigo_logica}"
-    )
+    # NUEVO: Enrutamiento Dinámico del Prompt
+    if req.lenguaje.lower() == "python":
+        prompt_ia = (
+            "Actúa como un desarrollador senior experto en Python y Green Coding.\n"
+            "Refactoriza el siguiente código para que sea lo más eficiente, corto y rápido posible (usa list comprehensions y funciones built-in).\n"
+            "REGLAS ESTRICTAS:\n"
+            "1. NO uses librerías externas (como pandas o numpy).\n"
+            "2. NO devuelvas HTML, CSS ni texto explicativo. Devuelve ÚNICAMENTE el código Python puro.\n"
+            "3. Omite comentarios redundantes.\n\n"
+            f"--- CÓDIGO PYTHON A OPTIMIZAR ---\n{req.codigo_logica}"
+        )
+    else:
+        prompt_ia = (
+            "Actúa como un desarrollador senior experto en Green Coding web.\n"
+            "Optimiza el siguiente diseño Frontend (HTML/CSS) y la lógica Backend.\n"
+            "REGLAS ESTRICTAS:\n"
+            "1. Optimiza el Frontend para accesibilidad, SEO y renderizado rápido del DOM.\n"
+            "2. Unifica el código en un formato limpio sin librerías de terceros.\n"
+            "3. Devuelve SOLO el código unificado, sin explicaciones.\n\n"
+            f"--- DISEÑO FRONTEND ---\n{req.codigo_ui}\n\n"
+            f"--- LÓGICA WEB ---\n{req.codigo_logica}"
+        )
     
     try:
         respuesta_ia = requests.post("http://localhost:11434/api/generate", json={"model": "gemma:2b", "prompt": prompt_ia, "stream": False})

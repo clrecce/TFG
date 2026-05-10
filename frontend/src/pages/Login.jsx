@@ -60,6 +60,9 @@ export default function Login({ onLogin }) {
         body: JSON.stringify({ pin })
       });
       if (res.ok) {
+        // Forzamos al navegador a limpiar cualquier URL residual (ej: /requisitos) y volver a la raíz
+        window.history.pushState({}, '', '/');
+        window.dispatchEvent(new Event('popstate'));
         onLogin(tempUser); 
       } else { setError('PIN incorrecto.'); }
     } catch (err) { setError('Error al verificar MFA.'); } 
@@ -98,7 +101,6 @@ export default function Login({ onLogin }) {
             <input type="password" required placeholder="Contraseña Robusta" value={formData.password} onChange={(e) => setFormData({...formData, password: e.target.value})} style={{ width: '100%', padding: '12px', borderRadius: '5px', backgroundColor: '#1e1e2f', color: 'white', border: '1px solid #3a3a52', boxSizing: 'border-box' }} />
             <small style={{ color: '#6b7280', fontSize: '11px', marginTop: '-10px' }}>* 8 a 16 caracteres, con mayúsculas, minúsculas y números.</small>
             
-            {/* SE AGREGARON TODOS LOS ROLES DE LA TESIS */}
             <select value={formData.rol} onChange={(e) => setFormData({...formData, rol: e.target.value})} style={{ width: '100%', padding: '12px', borderRadius: '5px', backgroundColor: '#1e1e2f', color: 'white', border: '1px solid #3a3a52', boxSizing: 'border-box' }}>
               <option value="Desarrollador">Desarrollador</option>
               <option value="Arquitecto de Software">Arquitecto de Software</option>

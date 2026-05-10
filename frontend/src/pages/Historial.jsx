@@ -10,6 +10,21 @@ export default function Historial() {
       .catch(error => console.error("Error:", error));
   }, []);
 
+  // Función simplificada: formatea de YYYY-MM-DD (o con T00:00:00) a DD/MM/YYYY
+  const formatearFecha = (fechaStr) => {
+    if (!fechaStr) return '';
+    try {
+      const soloFecha = fechaStr.split('T')[0]; // Corta cualquier hora fantasma
+      const partes = soloFecha.split('-');
+      if (partes.length === 3) {
+        return `${partes[2]}/${partes[1]}/${partes[0]}`;
+      }
+      return soloFecha;
+    } catch (e) {
+      return fechaStr;
+    }
+  };
+
   return (
     <div style={{ padding: '20px', color: 'white', maxWidth: '1100px', margin: '0 auto' }}>
       <h2 style={{ color: '#4ade80' }}>⏱️ Historial de Optimizaciones con IA</h2>
@@ -24,14 +39,13 @@ export default function Historial() {
               <div style={{ backgroundColor: '#1a1a24', padding: '15px', borderBottom: '1px solid #3a3a52', display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', gap: '10px' }}>
                 <div>
                   <span style={{ fontWeight: 'bold', color: '#a5b4fc' }}>Refactorización #{opt.id}</span>
-                  <span style={{ color: '#9ca3af', fontSize: '12px', marginLeft: '10px' }}>📅 {opt.fecha}</span>
+                  <span style={{ color: '#9ca3af', fontSize: '12px', marginLeft: '10px' }}>📅 {formatearFecha(opt.fecha)}</span>
                 </div>
                 <div style={{ backgroundColor: '#064e3b', padding: '5px 15px', borderRadius: '20px', border: '1px solid #10b981' }}>
                   <span style={{ color: '#34d399', fontWeight: 'bold', fontSize: '13px' }}>⚡ {opt.emisiones_co2_kg.toFixed(8)} kg CO2</span>
                 </div>
               </div>
               
-              {/* RESPONSIVE CODE BLOCKS: flexWrap y minWidth evitan el aplastamiento */}
               <div style={{ display: 'flex', flexWrap: 'wrap' }}>
                 <div style={{ flex: '1 1 300px', padding: '15px', borderRight: '1px solid #3a3a52', backgroundColor: '#1e1e2f', boxSizing: 'border-box' }}>
                   <h4 style={{ margin: '0 0 10px 0', color: '#fca5a5', fontSize: '14px' }}>Código Base (Ineficiente)</h4>
