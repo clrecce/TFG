@@ -3,7 +3,7 @@ import '../App.css';
 
 export default function Login({ onLogin }) {
   const [step, setStep] = useState(1);
-  const [formData, setFormData] = useState({ nombre: '', email: '', password: '', rol: 'Desarrollador' });
+  const [formData, setFormData] = useState({ email: '', password: '' });
   const [pin, setPin] = useState('');
   const [error, setError] = useState('');
   const [exito, setExito] = useState('');
@@ -29,28 +29,6 @@ export default function Login({ onLogin }) {
     finally { setLoading(false); }
   };
 
-  const handleRegistroSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true); setError(''); setExito('');
-    const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d\W]{8,16}$/;
-    if (!regex.test(formData.password)) {
-      setError('La contraseña debe tener entre 8 y 16 caracteres, e incluir mayúsculas, minúsculas y números.');
-      setLoading(false); return;
-    }
-    try {
-      const res = await fetch('http://127.0.0.1:8000/registro', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
-      });
-      const data = await res.json();
-      if (res.ok) {
-        setExito('Usuario registrado. Ya puedes iniciar sesión.');
-        setStep(1);
-      } else { setError(data.detail || 'Error al registrar.'); }
-    } catch (err) { setError('Error de conexión.'); } 
-    finally { setLoading(false); }
-  };
-
   const handleMfaSubmit = async (e) => {
     e.preventDefault();
     setLoading(true); setError('');
@@ -60,7 +38,6 @@ export default function Login({ onLogin }) {
         body: JSON.stringify({ pin })
       });
       if (res.ok) {
-        // Forzamos al navegador a limpiar cualquier URL residual (ej: /requisitos) y volver a la raíz
         window.history.pushState({}, '', '/');
         window.dispatchEvent(new Event('popstate'));
         onLogin(tempUser); 
@@ -76,7 +53,7 @@ export default function Login({ onLogin }) {
         <div style={{ textAlign: 'center', marginBottom: '30px' }}>
           <h1 style={{ color: '#4ade80', margin: '0 0 10px 0' }}>EcoDev Platform 🍃</h1>
           <p style={{ color: '#a5b4fc', margin: 0, fontSize: '14px' }}>
-            {step === 1 ? 'Inicia sesión para acceder' : step === 2 ? 'Autenticación Multifactor (MFA)' : 'Registro de Nuevo Usuario'}
+            {step === 1 ? 'Inicia sesión para acceder' : 'Autenticación Multifactor (MFA)'}
           </p>
         </div>
 
@@ -90,29 +67,6 @@ export default function Login({ onLogin }) {
             <button type="submit" disabled={loading} style={{ padding: '12px', backgroundColor: '#4ade80', color: '#1e1e2f', fontWeight: 'bold', border: 'none', borderRadius: '5px', cursor: 'pointer', marginTop: '10px' }}>
               {loading ? 'Verificando...' : 'Iniciar Sesión'}
             </button>
-            <p style={{ textAlign: 'center', color: '#9ca3af', fontSize: '13px', marginTop: '10px' }}>¿No tienes cuenta? <span onClick={() => {setStep(3); setError(''); setExito('');}} style={{ color: '#4ade80', cursor: 'pointer', textDecoration: 'underline' }}>Regístrate aquí</span></p>
-          </form>
-        )}
-
-        {step === 3 && (
-          <form onSubmit={handleRegistroSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-            <input type="text" required placeholder="Nombre Completo" value={formData.nombre} onChange={(e) => setFormData({...formData, nombre: e.target.value})} style={{ width: '100%', padding: '12px', borderRadius: '5px', backgroundColor: '#1e1e2f', color: 'white', border: '1px solid #3a3a52', boxSizing: 'border-box' }} />
-            <input type="email" required placeholder="Correo Electrónico" value={formData.email} onChange={(e) => setFormData({...formData, email: e.target.value})} style={{ width: '100%', padding: '12px', borderRadius: '5px', backgroundColor: '#1e1e2f', color: 'white', border: '1px solid #3a3a52', boxSizing: 'border-box' }} />
-            <input type="password" required placeholder="Contraseña Robusta" value={formData.password} onChange={(e) => setFormData({...formData, password: e.target.value})} style={{ width: '100%', padding: '12px', borderRadius: '5px', backgroundColor: '#1e1e2f', color: 'white', border: '1px solid #3a3a52', boxSizing: 'border-box' }} />
-            <small style={{ color: '#6b7280', fontSize: '11px', marginTop: '-10px' }}>* 8 a 16 caracteres, con mayúsculas, minúsculas y números.</small>
-            
-            <select value={formData.rol} onChange={(e) => setFormData({...formData, rol: e.target.value})} style={{ width: '100%', padding: '12px', borderRadius: '5px', backgroundColor: '#1e1e2f', color: 'white', border: '1px solid #3a3a52', boxSizing: 'border-box' }}>
-              <option value="Desarrollador">Desarrollador</option>
-              <option value="Arquitecto de Software">Arquitecto de Software</option>
-              <option value="Gerente de Proyecto">Gerente de Proyecto</option>
-              <option value="Ingeniero de Operaciones">Ingeniero de Operaciones</option>
-              <option value="Administrador">Administrador (Root)</option>
-            </select>
-
-            <button type="submit" disabled={loading} style={{ padding: '12px', backgroundColor: '#8b5cf6', color: 'white', fontWeight: 'bold', border: 'none', borderRadius: '5px', cursor: 'pointer', marginTop: '10px' }}>
-              {loading ? 'Registrando...' : 'Crear Cuenta Segura'}
-            </button>
-            <p style={{ textAlign: 'center', color: '#9ca3af', fontSize: '13px', marginTop: '10px' }}><span onClick={() => {setStep(1); setError(''); setExito('');}} style={{ color: '#a5b4fc', cursor: 'pointer', textDecoration: 'underline' }}>Volver al Login</span></p>
           </form>
         )}
 
