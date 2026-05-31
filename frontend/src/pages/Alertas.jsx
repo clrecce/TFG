@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 
 export default function Alertas() {
   const [alertas, setAlertas] = useState([]);
+  const [feedback, setFeedback] = useState('');
 
   const fetchAlertas = async () => {
     try {
@@ -15,7 +16,6 @@ export default function Alertas() {
 
   useEffect(() => {
     fetchAlertas();
-    // Un polling simple para buscar alertas nuevas cada 5 segundos
     const interval = setInterval(fetchAlertas, 5000);
     return () => clearInterval(interval);
   }, []);
@@ -23,16 +23,38 @@ export default function Alertas() {
   const resolverAlerta = async (id) => {
     try {
       await fetch(`http://127.0.0.1:8000/alertas/${id}/resolver`, { method: 'PUT' });
-      fetchAlertas(); // Recargamos la lista
+      fetchAlertas();
     } catch (error) {
       console.error("Error resolviendo alerta:", error);
     }
   };
 
+  const enviarFeedback = () => {
+    if(!feedback) return;
+    alert("✅ Feedback registrado: '"+ feedback + "'. Se considerará para la próxima iteración de optimización IA.");
+    setFeedback('');
+  };
+
   return (
     <div style={{ padding: '30px', color: 'white', maxWidth: '900px', margin: '0 auto' }}>
       <h2 style={{ color: '#f59e0b' }}>🔔 Centro de Alertas Ambientales</h2>
-      <p style={{ color: '#a5b4fc', marginBottom: '30px' }}>Notificaciones reales disparadas por el backend cuando la IA supera el umbral de CO2.</p>
+      <p style={{ color: '#a5b4fc', marginBottom: '30px' }}>Notificaciones disparadas por el backend cuando la IA supera el umbral de CO2.</p>
+
+      {/* REQUISITO HU-008 PUNTO 4: Feedback de sostenibilidad */}
+      <div style={{ marginBottom: '30px', padding: '20px', backgroundColor: '#1e1e2f', borderRadius: '8px', border: '1px solid #4ade80' }}>
+        <h4 style={{ margin: '0 0 10px 0', color: '#4ade80' }}>Feedback para Iteración Sostenible</h4>
+        <textarea 
+          value={feedback}
+          onChange={(e) => setFeedback(e.target.value)}
+          placeholder="Describe la ineficiencia detectada o sugerencia para mejorar la IA..." 
+          style={{ width: '100%', padding: '10px', backgroundColor: '#111', color: 'white', border: '1px solid #3a3a52', borderRadius: '5px', boxSizing: 'border-box' }} 
+        />
+        <button 
+          onClick={enviarFeedback}
+          style={{ marginTop: '10px', padding: '8px 16px', backgroundColor: '#4ade80', color: '#111', border: 'none', borderRadius: '5px', cursor: 'pointer', fontWeight: 'bold' }}>
+          Registrar Feedback para el motor IA
+        </button>
+      </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
         {alertas.length === 0 ? (

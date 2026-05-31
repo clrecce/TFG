@@ -60,7 +60,7 @@ export default function Despliegue() {
       if (data.resultado) {
           if (emisiones > umbral) {
               setEstado('rechazo_ambiental');
-              setLogs(data.logs + `\n\n⚠️ [BLOQUEO AMBIENTAL]\nEl código funciona pero su huella energética (${emisiones.toFixed(6)} kg CO2) EX_CEDE el umbral permitido (${umbral} kg CO2).\nRefactorice para reducir el consumo antes de desplegar.`);
+              setLogs(data.logs + `\n\n⚠️ [BLOQUEO AMBIENTAL]\nEl código funciona pero su huella energética (${emisiones.toFixed(6)} kg CO2) EXCEDE el umbral permitido (${umbral} kg CO2).\nRefactorice para reducir el consumo antes de desplegar.`);
           } else {
               setEstado('aprobado');
               setLogs(data.logs + `\n\n✅ [CERTIFICACIÓN ECO-EFICIENTE]\nCódigo funcional y huella ecológica óptima (${emisiones.toFixed(6)} kg CO2).\nListo para AWS.`);

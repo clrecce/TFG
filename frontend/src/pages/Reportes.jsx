@@ -30,15 +30,22 @@ export default function Reportes() {
     } catch (error) { console.error("Error al cargar historial de reportes:", error); }
   };
 
+  // Cálculos necesarios para el reporte
   const totalKwh = data.reqs.reduce((acc, curr) => acc + curr.kwh_estimado, 0);
   const totalCo2Requisitos = totalKwh * 0.43; 
-  
-  // CÁLCULOS DEL HU-007 (La Comparativa)
   const totalCo2Generacion = data.opts.reduce((acc, curr) => acc + curr.emisiones_co2_kg, 0);
   const baselineTradicional = data.reqs.length * 1.5; 
   const ahorroPorcentaje = baselineTradicional > 0 ? ((baselineTradicional - totalCo2Generacion) / baselineTradicional) * 100 : 0;
 
+  // Lógica de impresión PDF (La funcionalidad agregada)
   const handleImprimirReal = () => {
+
+  // NUEVA VALIDACIÓN PARA EL PUNTO 3 (Integridad de datos)
+    if (data.reqs.length === 0 || data.opts.length === 0) {
+      alert("⚠️ Validación ambiental: No hay suficientes datos (requisitos u optimizaciones) para generar un reporte con precisión ambiental. Por favor, complete los procesos de desarrollo primero.");
+      return;
+    }
+
     setGenerando(true);
     setPdfMode(true); 
 
@@ -71,6 +78,7 @@ export default function Reportes() {
     }, 500); 
   };
 
+  // Estilos dinámicos para el PDF
   const bgColor = pdfMode ? '#ffffff' : '#252536';
   const textColor = pdfMode ? '#000000' : 'white';
   const subTextColor = pdfMode ? '#4b5563' : '#9ca3af';
@@ -80,16 +88,18 @@ export default function Reportes() {
   return (
     <div style={{ padding: '30px', color: 'white', maxWidth: '800px', margin: '0 auto' }}>
       
+      {/* Cabecera de controles */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
         <h2 style={{ color: '#4ade80', margin: 0 }}>📄 Generador de Reportes Ambientales</h2>
         <button 
           onClick={handleImprimirReal} 
           disabled={generando}
           style={{ padding: '10px 20px', backgroundColor: '#8b5cf6', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer', fontWeight: 'bold' }}>
-          {generando ? '📸 Capturando PDF y Guardando...' : '📥 Descargar PDF Imprimible'}
+          {generando ? '📸 Capturando PDF...' : '📥 Descargar PDF Imprimible'}
         </button>
       </div>
 
+      {/* CONTENEDOR PARA EXPORTACIÓN */}
       <div style={{ display: 'inline-block', width: '100%', marginBottom: '40px' }}>
         <div id="reporte-pdf-container" style={{ backgroundColor: bgColor, padding: '40px', borderRadius: '8px', border: `1px solid ${borderColor}`, transition: 'all 0.3s ease' }}>
           <div style={{ borderBottom: '2px solid #4ade80', paddingBottom: '20px', marginBottom: '20px' }}>
@@ -121,7 +131,7 @@ export default function Reportes() {
             </tbody>
           </table>
 
-          {/* NUEVA SECCIÓN: Explicación Metodológica para el Jurado */}
+          {/* Explicación Metodológica */}
           <div style={{ backgroundColor: boxBgColor, padding: '15px', border: `1px solid ${borderColor}`, borderRadius: '4px', marginBottom: '20px' }}>
             <h5 style={{ margin: '0 0 5px 0', color: textColor }}>* Aclaración Metodológica de Comparación:</h5>
             <p style={{ margin: 0, fontSize: '11px', lineHeight: '1.4', color: subTextColor }}>
