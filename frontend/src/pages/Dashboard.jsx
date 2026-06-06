@@ -115,7 +115,6 @@ export default function Dashboard() {
               formatter={(value) => [value.toFixed(4), "Emisión (kg CO2/hr)"]}
             />
             
-            {/* type="monotoneX" evita el exceso del renderizado curvo sobre los topes matemáticos */}
             <Line type="monotoneX" dataKey="co2_servidor" name="Emisión" stroke="#4ade80" strokeWidth={2} dot={false} animationDuration={300} />
           </LineChart>
         </ResponsiveContainer>
@@ -124,13 +123,14 @@ export default function Dashboard() {
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '20px' }}>
         <div style={{ backgroundColor: '#1a1a24', padding: '20px', borderRadius: '8px', border: '1px solid #3a3a52', flex: '1 1 300px', display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: '15px' }}>
           <div style={{ flex: '1 1 200px' }}>
-            <span style={{ backgroundColor: '#064e3b', color: '#34d399', padding: '5px 10px', borderRadius: '20px', fontSize: '12px', fontWeight: 'bold' }}>CodeCarbon Hardware</span>
-            <h3 style={{ margin: '15px 0 5px 0', color: 'white', fontSize: '18px' }}>Huella Desarrollo IA</h3>
-            <p style={{ margin: 0, color: '#d1d5db', fontSize: '12px' }}>Línea Base: <b>{baselineTradicional.toFixed(2)} kg CO2</b>.</p>
+            <span style={{ backgroundColor: '#064e3b', color: '#34d399', padding: '5px 10px', borderRadius: '20px', fontSize: '12px', fontWeight: 'bold' }}>Sensor Físico: CodeCarbon</span>
+            <h3 style={{ margin: '15px 0 5px 0', color: 'white', fontSize: '18px' }}>Impacto Ambiental Acumulado</h3>
+            <p style={{ margin: 0, color: '#d1d5db', fontSize: '12px' }}>Estimación Método Tradicional: <b style={{color: '#fca5a5'}}>{baselineTradicional.toFixed(2)} kg CO2</b></p>
           </div>
           <div style={{ textAlign: 'right' }}>
+            <p style={{ margin: '0 0 5px 0', color: '#a5b4fc', fontSize: '13px', fontWeight: 'bold' }}>Consumo Real con IA (EcoDev)</p>
             <h1 style={{ color: '#fbbf24', fontSize: '36px', margin: 0 }}>{ecoDevReal.toFixed(6)}</h1>
-            <strong style={{ color: '#fbbf24', fontSize: '14px' }}>kg CO2 Total</strong>
+            <strong style={{ color: '#fbbf24', fontSize: '14px' }}>kg CO2 Emitidos</strong>
           </div>
         </div>
 
