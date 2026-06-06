@@ -110,7 +110,7 @@ export default function Despliegue() {
         </div>
         
         <div style={{ flex: '1 1 250px' }}>
-          <label style={{ display: 'block', marginBottom: '5px', color: '#a5b4fc', fontWeight: 'bold' }}>Entorno de Pruebas (Pipeline):</label>
+          <label style={{ display: 'block', marginBottom: '5px', color: '#a5b4fc', fontWeight: 'bold' }}>Selector de Entorno de Pruebas:</label>
           <select value={lenguajeTest} onChange={(e) => setLenguajeTest(e.target.value)} style={{ width: '100%', padding: '10px', borderRadius: '5px', backgroundColor: '#1e1e2f', color: 'white', border: '1px solid #3a3a52' }}>
             <option value="python">Python (Lógica Back-End)</option>
             <option value="html">HTML/JS (Front-End Estructural)</option>
