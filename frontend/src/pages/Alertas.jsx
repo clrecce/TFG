@@ -40,7 +40,7 @@ export default function Alertas() {
       <h2 style={{ color: '#f59e0b' }}>🔔 Centro de Alertas Ambientales</h2>
       <p style={{ color: '#a5b4fc', marginBottom: '30px' }}>Notificaciones disparadas por el backend cuando la IA supera el umbral de CO2.</p>
 
-      {/* REQUISITO HU-008 PUNTO 4: Feedback de sostenibilidad */}
+      {/* REQUISITO HU-008 PUNTO 4: Feedback de sostenibilidad
       <div style={{ marginBottom: '30px', padding: '20px', backgroundColor: '#1e1e2f', borderRadius: '8px', border: '1px solid #4ade80' }}>
         <h4 style={{ margin: '0 0 10px 0', color: '#4ade80' }}>Feedback para Iteración Sostenible</h4>
         <textarea 
@@ -54,7 +54,7 @@ export default function Alertas() {
           style={{ marginTop: '10px', padding: '8px 16px', backgroundColor: '#4ade80', color: '#111', border: 'none', borderRadius: '5px', cursor: 'pointer', fontWeight: 'bold' }}>
           Registrar Feedback para el motor IA
         </button>
-      </div>
+      </div> */}
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
         {alertas.length === 0 ? (
