@@ -14,7 +14,7 @@ export default function Historial() {
   const formatearFecha = (fechaStr) => {
     if (!fechaStr) return '';
     try {
-      const soloFecha = fechaStr.split('T')[0]; // Corta cualquier hora fantasma
+      const soloFecha = fechaStr.split('T')[0];
       const partes = soloFecha.split('-');
       if (partes.length === 3) {
         return `${partes[2]}/${partes[1]}/${partes[0]}`;
@@ -27,8 +27,8 @@ export default function Historial() {
 
   return (
     <div style={{ padding: '20px', color: 'white', maxWidth: '1100px', margin: '0 auto' }}>
-      <h2 style={{ color: '#4ade80' }}>⏱️ Historial de Optimizaciones con IA</h2>
-      <p style={{ color: '#a5b4fc', marginBottom: '30px' }}>Registro de las refactorizaciones de código realizadas por Gemma 2b.</p>
+      <h2 style={{ color: '#4ade80' }}>Historial de Optimizaciones con IA</h2>
+      <p style={{ color: '#a5b4fc', marginBottom: '30px' }}>Registro de las refactorizaciones de código realizadas por la IA.</p>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '25px' }}>
         {optimizaciones.length === 0 ? (
@@ -39,10 +39,10 @@ export default function Historial() {
               <div style={{ backgroundColor: '#1a1a24', padding: '15px', borderBottom: '1px solid #3a3a52', display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', gap: '10px' }}>
                 <div>
                   <span style={{ fontWeight: 'bold', color: '#a5b4fc' }}>Refactorización #{opt.id}</span>
-                  <span style={{ color: '#9ca3af', fontSize: '12px', marginLeft: '10px' }}>📅 {formatearFecha(opt.fecha)}</span>
+                  <span style={{ color: '#9ca3af', fontSize: '12px', marginLeft: '10px' }}>{formatearFecha(opt.fecha)}</span>
                 </div>
                 <div style={{ backgroundColor: '#064e3b', padding: '5px 15px', borderRadius: '20px', border: '1px solid #10b981' }}>
-                  <span style={{ color: '#34d399', fontWeight: 'bold', fontSize: '13px' }}>⚡ {opt.emisiones_co2_kg.toFixed(8)} kg CO2</span>
+                  <span style={{ color: '#34d399', fontWeight: 'bold', fontSize: '13px' }}>{opt.emisiones_co2_kg.toFixed(8)} kg CO2</span>
                 </div>
               </div>
               

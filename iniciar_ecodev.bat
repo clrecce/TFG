@@ -13,7 +13,7 @@ timeout /t 3 /nobreak > nul
 
 echo [2/4] Iniciando el Backend (FastAPI + MySQL)...
 cd /d C:\TFG\backend
-:: AQUI ESTÁ LA MAGIA: Cambiamos 'uvicorn' por 'python -m uvicorn'
+:: Cambiamos 'uvicorn' por 'python -m uvicorn'
 start "EcoDev Backend" cmd /c "call venv\Scripts\activate && python -m uvicorn main:app --reload"
 
 echo [3/4] Iniciando el Frontend (React/Vite)...

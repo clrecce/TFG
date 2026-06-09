@@ -55,10 +55,10 @@ export default function Editor() {
         blockManager: {
           appendTo: '#blocks',
           blocks: [
-            { id: 'eco-button', label: '<b>Botón Semántico</b> <br/> <small>⚡ 0.3 kWh</small>', content: '<button style="padding:10px 20px; background:#4ade80; border:none; border-radius:5px; color:#1e1e2f; font-weight:bold; cursor:pointer; margin:5px;">Botón Eco</button>' },
-            { id: 'eco-form', label: '<b>Formulario</b> <br/> <small>⚡ 1.2 kWh</small>', content: '<form style="padding:20px; background:#f4f4f5; border-radius:8px; margin:5px;"><input type="text" placeholder="Ingresa datos..." style="padding:10px; width:80%; margin-bottom:10px;"/><br/><button style="padding:10px 20px; background:#4ade80; border:none; border-radius:5px;">Enviar</button></form>' },
-            { id: 'api-rest', label: '<b>Lógica API</b> <br/> <small>⚡ 1.5 kWh</small>', content: '<div style="padding:15px; background:#3b82f6; color:white; border-radius:5px; text-align:center; margin:5px;">Conexión a Entidad DER</div>' },
-            { id: 'ml-model', label: '<b>Modelo ML</b> <br/> <small>⚡ 2.1 kWh</small>', content: '<div style="padding:15px; background:#8b5cf6; color:white; border-radius:5px; text-align:center; margin:5px;">Optimización Gemma (Simulada)</div>' }
+            { id: 'eco-button', label: '<b>Botón Semántico</b> <br/> <small>0.3 kWh</small>', content: '<button style="padding:10px 20px; background:#4ade80; border:none; border-radius:5px; color:#1e1e2f; font-weight:bold; cursor:pointer; margin:5px;">Botón Eco</button>' },
+            { id: 'eco-form', label: '<b>Formulario</b> <br/> <small>1.2 kWh</small>', content: '<form style="padding:20px; background:#f4f4f5; border-radius:8px; margin:5px;"><input type="text" placeholder="Ingresa datos..." style="padding:10px; width:80%; margin-bottom:10px;"/><br/><button style="padding:10px 20px; background:#4ade80; border:none; border-radius:5px;">Enviar</button></form>' },
+            { id: 'api-rest', label: '<b>Lógica API</b> <br/> <small>1.5 kWh</small>', content: '<div style="padding:15px; background:#3b82f6; color:white; border-radius:5px; text-align:center; margin:5px;">Conexión a Entidad DER</div>' },
+            { id: 'ml-model', label: '<b>Modelo ML</b> <br/> <small>2.1 kWh</small>', content: '<div style="padding:15px; background:#8b5cf6; color:white; border-radius:5px; text-align:center; margin:5px;">Optimización Gemma (Simulada)</div>' }
           ]
         }
       });
@@ -68,10 +68,10 @@ export default function Editor() {
         const styles = model.get('style') || {};
         
         if (tagName === 'div' && model.getClasses().length === 0) {
-          alert('🌱 ALERTA ECO-DEV: Componente no reutilizable detectado. Estás insertando un contenedor genérico (<div>) sin definir clases. Para mejorar la eficiencia del DOM, usa etiquetas semánticas o clases CSS globales.');
+          alert('ALERTA ECO-DEV: Componente no reutilizable detectado. Estás insertando un contenedor genérico (<div>) sin definir clases. Para mejorar la eficiencia del DOM, usa etiquetas semánticas o clases CSS globales.');
         } 
         else if (Object.keys(styles).length > 2) {
-          alert('🌱 ALERTA ECO-DEV: Exceso de estilos en línea detectado. Esto incrementa la carga del renderizado. Delega el diseño a tu hoja de estilos CSS.');
+          alert('ALERTA ECO-DEV: Exceso de estilos en línea detectado. Esto incrementa la carga del renderizado. Delega el diseño a tu hoja de estilos CSS.');
         }
       });
     }
@@ -122,7 +122,7 @@ export default function Editor() {
       data.bloques.forEach((htmlString, index) => {
         nuevoContador++;
         bm.add(`ia-block-${Date.now()}-${index}`, {
-          label: `🍃 Componente ${nuevoContador}`,
+          label: `Componente ${nuevoContador}`,
           content: htmlString,
           category: 'Sugerencias IA (Green IT)',
           attributes: { class: 'gjs-block' }
@@ -130,7 +130,7 @@ export default function Editor() {
       });
       
       setContadorComponentes(nuevoContador);
-      alert('✅ La IA ha analizado el requisito y los componentes ecoeficientes ya están disponibles en tu panel lateral.');
+      alert('La IA ha analizado el requisito y los componentes ecoeficientes ya están disponibles en tu panel lateral.');
     } catch (error) {
       console.error("Error al sugerir componentes:", error);
     } finally {
@@ -239,7 +239,7 @@ export default function Editor() {
           </select>
 
           <button className="btn-optimizar" onClick={handleOptimize} disabled={isOptimizing || proyectos.length === 0} style={{ width: '100%', opacity: proyectos.length === 0 ? 0.5 : 1 }}>
-            {isOptimizing ? '⏳ Procesando Refactorización IA...' : '✨ Generar refactorización y Medir CO2'}
+            {isOptimizing ? 'Procesando Refactorización IA...' : 'Generar refactorización y Medir CO2'}
           </button>
         </div>
 
@@ -270,14 +270,14 @@ export default function Editor() {
             disabled={generandoBloques || !promptArquitectura}
             style={{ backgroundColor: generandoBloques ? '#4b5563' : '#8b5cf6', color: 'white', border: 'none', padding: '10px 15px', borderRadius: '5px', cursor: generandoBloques ? 'not-allowed' : 'pointer', fontWeight: 'bold' }}
           >
-            {generandoBloques ? '⚙️ Analizando...' : '🧠 Sugerir Componentes'}
+            {generandoBloques ? 'Analizando...' : 'Sugerir Componentes'}
           </button>
           
           <button 
             onClick={evaluarDisenoPreliminar}
             style={{ backgroundColor: '#10b981', color: 'white', border: 'none', padding: '10px 15px', borderRadius: '5px', cursor: 'pointer', fontWeight: 'bold' }}
           >
-            📏 Validar Diseño
+            Validar Diseño
           </button>
 
           <button 
@@ -285,7 +285,7 @@ export default function Editor() {
             style={{ backgroundColor: '#ef4444', color: 'white', border: 'none', padding: '10px 15px', borderRadius: '5px', cursor: 'pointer', fontWeight: 'bold' }}
             title="Borrar todo el contenido visual del lienzo"
           >
-            🗑️ Limpiar Lienzo
+            Limpiar Lienzo
           </button>
 
           {impactoProyectado && (
@@ -301,12 +301,12 @@ export default function Editor() {
 
         <div style={{ backgroundColor: '#1a1a24', borderTop: '2px solid #3a3a52', padding: '15px', flexShrink: 0 }}>
           <label style={{ color: '#a5b4fc', fontWeight: 'bold', fontSize: '14px', display: 'block', marginBottom: '10px' }}>
-            Refactorización Manual (HU-006) - Pega tu código legacy aquí:
+            Refactorización Manual - Pega tu código aquí:
           </label>
           <textarea 
             value={codigoBackend} 
             onChange={(e) => setCodigoBackend(e.target.value)}
-            placeholder="Pega aquí tu código sucio. La IA eliminará las ineficiencias."
+            placeholder="Pega aquí tu código. La IA eliminará las ineficiencias."
             style={{ width: '100%', height: '130px', backgroundColor: '#1e1e2f', color: '#fca5a5', border: '1px solid #3a3a52', borderRadius: '5px', fontFamily: 'monospace', fontSize: '12px', padding: '10px', boxSizing: 'border-box' }}
           />
         </div>
@@ -332,7 +332,7 @@ export default function Editor() {
               </div>
               <div style={{ textAlign: 'right' }}>
                 <p style={{ margin: 0, fontSize: '12px', color: '#a7f3d0' }}>Eficiencia</p>
-                <h3 style={{ margin: '5px 0', color: '#34d399' }}>Validada ✓</h3>
+                <h3 style={{ margin: '5px 0', color: '#34d399' }}>Validada</h3>
               </div>
             </div>
           </div>
@@ -340,7 +340,7 @@ export default function Editor() {
           <div className="metric-card" style={{ marginBottom: '15px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
               <p style={{ margin: 0, fontSize: '14px', color: '#9ca3af' }}>Código Unificado</p>
-              <button onClick={descargarCodigo} style={{ backgroundColor: '#3b82f6', color: 'white', border: 'none', padding: '5px 10px', borderRadius: '3px', cursor: 'pointer', fontSize: '12px', fontWeight: 'bold' }}>📥 Archivar</button>
+              <button onClick={descargarCodigo} style={{ backgroundColor: '#3b82f6', color: 'white', border: 'none', padding: '5px 10px', borderRadius: '3px', cursor: 'pointer', fontSize: '12px', fontWeight: 'bold' }}>Archivar</button>
             </div>
             <div className="code-box" style={{ marginTop: '10px', height: '150px', fontSize: '11px', overflowY: 'auto' }}>{metrics.codigo_optimizado}</div>
           </div>
@@ -353,7 +353,7 @@ export default function Editor() {
                 disabled={cargandoSugerencias}
                 style={{ backgroundColor: cargandoSugerencias ? '#4b5563' : '#8b5cf6', color: 'white', border: 'none', padding: '5px 10px', borderRadius: '3px', cursor: cargandoSugerencias ? 'not-allowed' : 'pointer', fontSize: '11px', fontWeight: 'bold' }}
               >
-                {cargandoSugerencias ? 'Consultando...' : '💡 Sugerir Mejoras'}
+                {cargandoSugerencias ? 'Consultando...' : 'Sugerir Mejoras'}
               </button>
             </div>
             

@@ -96,7 +96,7 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
     except Exception:
         return False
 
-# --- TESTING FÍSICO REAL (CON METRICAS Y ALERTAS HU-004) ---
+# --- TESTING FÍSICO REAL ---
 @app.post("/ejecutar-test-real")
 def ejecutar_test_real(req: CodigoTestRequest, db: Session = Depends(get_db)):
     resultado_ok = False
@@ -350,7 +350,7 @@ def optimizar_codigo(req: CodigoRequest, db: Session = Depends(get_db)):
     tracker = EmissionsTracker(project_name="ecodev_ia", measure_power_secs=1)
     tracker.start()
     
-    # REGLAS REFORZADAS: Se exige explícitamente mantener las variables iniciales
+    # PROMPTS
     if req.lenguaje.lower() == "python":
         prompt_ia = (
             "Eres un refactorizador estricto de código Python.\n"
@@ -407,7 +407,7 @@ def optimizar_codigo(req: CodigoRequest, db: Session = Depends(get_db)):
     config = db.execute(select(configuracion).where(configuracion.c.id == 1)).mappings().first()
     umbral = config['umbral_co2'] if config else 0.05
     if emisiones_kg > umbral:
-        db.execute(alertas.insert().values(severidad="Alta", mensaje=f"Pico detectado: La refactorización generó {emisiones_kg:.6f} kg CO2.", recomendacion="Revisar código enviado o umbral LLM.", resuelta=False, fecha=datetime.datetime.now().date()))
+        db.execute(alertas.insert().values(severidad="Alta", mensaje=f"Pico detectado: La refactorización generó {emisiones_kg:.6f} kg CO2.", recomendacion="Revisar código enviado o umbral.", resuelta=False, fecha=datetime.datetime.now().date()))
 
     db.commit()
     return {"codigo_optimizado": codigo_optimizado, "emisiones_co2_kg": emisiones_kg}

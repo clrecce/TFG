@@ -31,13 +31,13 @@ export default function Alertas() {
 
   const enviarFeedback = () => {
     if(!feedback) return;
-    alert("✅ Feedback registrado: '"+ feedback + "'. Se considerará para la próxima iteración de optimización IA.");
+    alert("Feedback registrado: '"+ feedback + "'. Se considerará para la próxima iteración de optimización IA.");
     setFeedback('');
   };
 
   return (
     <div style={{ padding: '30px', color: 'white', maxWidth: '900px', margin: '0 auto' }}>
-      <h2 style={{ color: '#f59e0b' }}>🔔 Centro de Alertas Ambientales</h2>
+      <h2 style={{ color: '#f59e0b' }}>Centro de Alertas Ambientales</h2>
       <p style={{ color: '#a5b4fc', marginBottom: '30px' }}>Notificaciones disparadas por el backend cuando la IA supera el umbral de CO2.</p>
 
       {/* REQUISITO HU-008 PUNTO 4: Feedback de sostenibilidad
@@ -69,7 +69,7 @@ export default function Alertas() {
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                 <div>
                   <h4 style={{ margin: '0 0 10px 0', color: 'white' }}>
-                    {alerta.severidad === 'Alta' ? '🚨' : '⚠️'} {alerta.mensaje}
+                    {alerta.severidad === 'Alta' ? '' : ''} {alerta.mensaje}
                   </h4>
                   <p style={{ margin: 0, color: '#9ca3af', fontSize: '14px' }}><strong>Sugerencia del Sistema:</strong> {alerta.recomendacion}</p>
                 </div>
@@ -80,7 +80,7 @@ export default function Alertas() {
                     Marcar como Resuelta
                   </button>
                 ) : (
-                  <span style={{ color: '#4ade80', fontWeight: 'bold' }}>✓ Mitigada</span>
+                  <span style={{ color: '#4ade80', fontWeight: 'bold' }}>Mitigada</span>
                 )}
               </div>
             </div>

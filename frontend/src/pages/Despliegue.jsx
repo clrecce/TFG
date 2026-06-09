@@ -5,7 +5,7 @@ export default function Despliegue() {
   const [proyectos, setProyectos] = useState([]);
   const [proyectoId, setProyectoId] = useState('');
   
-  // NUEVO: Estado para que el DevOps elija qué entorno virtual levantar
+  // Estado para que el DevOps elija qué entorno virtual levantar
   const [lenguajeTest, setLenguajeTest] = useState('python'); 
   
   const [historialDespliegues, setHistorialDespliegues] = useState([]); 
@@ -50,7 +50,7 @@ export default function Despliegue() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           codigo: ultimaOpt ? ultimaOpt.codigo_optimizado : "",
-          lenguaje: lenguajeTest, // AHORA TOMA EL VALOR DEL SELECTOR
+          lenguaje: lenguajeTest,
           proyecto_id: parseInt(proyectoId)
         })
       });
@@ -60,10 +60,10 @@ export default function Despliegue() {
       if (data.resultado) {
           if (emisiones > umbral) {
               setEstado('rechazo_ambiental');
-              setLogs(data.logs + `\n\n⚠️ [BLOQUEO AMBIENTAL]\nEl código funciona pero su huella energética (${emisiones.toFixed(6)} kg CO2) EXCEDE el umbral permitido (${umbral} kg CO2).\nRefactorice para reducir el consumo antes de desplegar.`);
+              setLogs(data.logs + `\n\n[BLOQUEO AMBIENTAL]\nEl código funciona pero su huella energética (${emisiones.toFixed(6)} kg CO2) EXCEDE el umbral permitido (${umbral} kg CO2).\nRefactorice para reducir el consumo antes de desplegar.`);
           } else {
               setEstado('aprobado');
-              setLogs(data.logs + `\n\n✅ [CERTIFICACIÓN ECO-EFICIENTE]\nCódigo funcional y huella ecológica óptima (${emisiones.toFixed(6)} kg CO2).\nListo para AWS.`);
+              setLogs(data.logs + `\n\n[CERTIFICACIÓN ECO-EFICIENTE]\nCódigo funcional y huella ecológica óptima (${emisiones.toFixed(6)} kg CO2).\nListo para AWS.`);
           }
       } else {
           setEstado('error');
@@ -96,7 +96,7 @@ export default function Despliegue() {
 
   return (
     <div style={{ padding: '20px', color: 'white', maxWidth: '900px', margin: '0 auto' }}>
-      <h2 style={{ color: '#4ade80' }}>🚀 Pipeline de CI/CD: Validación y Despliegue</h2>
+      <h2 style={{ color: '#4ade80' }}>Pipeline de CI/CD: Validación y Despliegue</h2>
       <p style={{ color: '#a5b4fc', marginBottom: '30px' }}>Control de calidad eco-eficiente para asegurar que solo el código sostenible llegue a la nube.</p>
       
       {/* NUEVO CONTENEDOR DE SELECTORES */}
@@ -113,7 +113,7 @@ export default function Despliegue() {
           <label style={{ display: 'block', marginBottom: '5px', color: '#a5b4fc', fontWeight: 'bold' }}>Selector de Entorno de Pruebas:</label>
           <select value={lenguajeTest} onChange={(e) => setLenguajeTest(e.target.value)} style={{ width: '100%', padding: '10px', borderRadius: '5px', backgroundColor: '#1e1e2f', color: 'white', border: '1px solid #3a3a52' }}>
             <option value="python">Python (Lógica Back-End)</option>
-            <option value="html">HTML/JS (Front-End Estructural)</option>
+            <option value="html">HTML/CSS/JS (Front-End Estructural)</option>
           </select>
         </div>
       </div>
@@ -126,9 +126,9 @@ export default function Despliegue() {
             </span>
           </h3>
           
-          {estado === 'pendiente' && <button onClick={ejecutarPruebaReal} disabled={proyectos.length === 0} style={{ padding: '10px', backgroundColor: '#3b82f6', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer', fontWeight: 'bold', flexGrow: 1 }}>▶️ Ejecutar Pruebas Físicas</button>}
-          {(estado === 'error' || estado === 'rechazo_ambiental') && <button onClick={ejecutarPruebaReal} style={{ padding: '10px', backgroundColor: '#ef4444', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer', fontWeight: 'bold', flexGrow: 1 }}>🔄 Reintentar Pipeline</button>}
-          {estado === 'aprobado' && <button onClick={ejecutarDespliegue} style={{ padding: '10px', backgroundColor: '#4ade80', color: '#1e1e2f', border: 'none', borderRadius: '5px', cursor: 'pointer', fontWeight: 'bold', flexGrow: 1 }}>☁️ Aprobar Despliegue AWS</button>}
+          {estado === 'pendiente' && <button onClick={ejecutarPruebaReal} disabled={proyectos.length === 0} style={{ padding: '10px', backgroundColor: '#3b82f6', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer', fontWeight: 'bold', flexGrow: 1 }}>Ejecutar Pruebas Físicas</button>}
+          {(estado === 'error' || estado === 'rechazo_ambiental') && <button onClick={ejecutarPruebaReal} style={{ padding: '10px', backgroundColor: '#ef4444', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer', fontWeight: 'bold', flexGrow: 1 }}>Reintentar Pipeline</button>}
+          {estado === 'aprobado' && <button onClick={ejecutarDespliegue} style={{ padding: '10px', backgroundColor: '#4ade80', color: '#1e1e2f', border: 'none', borderRadius: '5px', cursor: 'pointer', fontWeight: 'bold', flexGrow: 1 }}>Aprobar Despliegue AWS</button>}
         </div>
 
         <div style={{ backgroundColor: '#1e1e2f', padding: '15px', borderRadius: '5px', fontFamily: 'monospace', color: '#d1d5db', minHeight: '160px', overflowX: 'auto', whiteSpace: 'pre-wrap', fontSize: '12px' }}>
@@ -136,7 +136,7 @@ export default function Despliegue() {
         </div>
       </div>
 
-      <h3 style={{ color: '#a5b4fc', borderBottom: '1px solid #3a3a52', paddingBottom: '10px' }}>🗄️ Historial de Despliegues Cloud Certificados</h3>
+      <h3 style={{ color: '#a5b4fc', borderBottom: '1px solid #3a3a52', paddingBottom: '10px' }}>Historial de Despliegues Cloud Certificados</h3>
       
       <div style={{ overflowX: 'auto', borderRadius: '8px', border: '1px solid #3a3a52', marginTop: '15px' }}>
         <table style={{ width: '100%', borderCollapse: 'collapse', backgroundColor: '#252536', minWidth: '700px' }}>

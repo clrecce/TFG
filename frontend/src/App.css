@@ -47,7 +47,6 @@ body, html {
   text-align: center;
 }
 
-/* NUEVOS ESTILOS PARA LA CABECERA Y MÉTRICAS */
 .header-actions {
   display: flex;
   align-items: center;

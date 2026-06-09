@@ -35,8 +35,8 @@ export default function Proyectos() {
 
   return (
     <div style={{ padding: '20px', color: 'white', maxWidth: '1000px', margin: '0 auto' }}>
-      <h2 style={{ color: '#4ade80' }}>📁 Gestión de Proyectos</h2>
-      <p style={{ color: '#a5b4fc', marginBottom: '20px' }}>Iniciativa y registro de nuevos proyectos tecnológicos sostenibles.</p>
+      <h2 style={{ color: '#4ade80' }}>Gestión de Proyectos</h2>
+      <p style={{ color: '#a5b4fc', marginBottom: '20px' }}>Registro de nuevos proyectos tecnológicos sostenibles.</p>
       
       <div style={{ backgroundColor: '#252536', padding: '20px', borderRadius: '8px', border: '1px solid #3a3a52' }}>
         {/* RESPONSIVE FORM: flexWrap permite apilar los inputs */}
@@ -81,7 +81,7 @@ export default function Proyectos() {
                   <span style={{ backgroundColor: p.estado === 'Desplegado' ? '#064e3b' : '#1e3a8a', color: p.estado === 'Desplegado' ? '#34d399' : '#93c5fd', padding: '5px 10px', borderRadius: '20px', fontSize: '12px', fontWeight: 'bold' }}>{p.estado}</span>
                 </td>
                 <td style={{ padding: '15px', textAlign: 'center' }}>
-                  <button onClick={() => handleDelete(p.id)} style={{ background: 'transparent', border: 'none', color: '#ef4444', cursor: 'pointer', fontSize: '16px' }}>🗑️</button>
+                  <button onClick={() => handleDelete(p.id)} style={{ backgroundColor: '#ef4444', border: 'none', borderRadius: '3px', color: 'white', cursor: 'pointer', padding: '5px 10px', fontSize: '16px' }}>Borrar</button>
                 </td>
               </tr>
             ))}

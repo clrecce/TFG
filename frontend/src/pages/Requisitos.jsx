@@ -23,10 +23,9 @@ export default function Requisitos() {
     } catch (error) { console.error("Error:", error); }
   };
 
-  // Función pura: Solo calcula, evitando desfases asíncronos en la edición
   const calcularHuella = (texto, nivelPrioridad) => {
     if (texto.trim().length < 20) {
-      setAlertaAmbiental('⚠️ Falta contexto técnico.');
+      setAlertaAmbiental('Falta contexto técnico.');
       setKwhEstimado(0); 
       return;
     }
@@ -107,8 +106,8 @@ export default function Requisitos() {
 
   return (
     <div style={{ padding: '20px', color: 'white', maxWidth: '1000px', margin: '0 auto' }}>
-      <h2 style={{ color: '#4ade80' }}>📝 Recopilación de Requisitos (Green IT)</h2>
-      <p style={{ color: '#a5b4fc', marginBottom: '20px' }}>Ingresa las historias de usuario y el sistema estimará la huella energética.</p>
+      <h2 style={{ color: '#4ade80' }}>Recopilación de Requisitos (Green IT)</h2>
+      <p style={{ color: '#a5b4fc', marginBottom: '20px' }}>Ingresa los requisitos y el sistema estimará la huella energética.</p>
 
       <div style={{ backgroundColor: '#252536', padding: '20px', borderRadius: '8px', border: '1px solid #3a3a52', marginBottom: '30px' }}>
         <form onSubmit={handleSubmit}>
@@ -142,11 +141,11 @@ export default function Requisitos() {
 
           <div style={{ display: 'flex', gap: '10px', flexDirection: 'row', width: '100%' }}>
             <button type="submit" disabled={kwhEstimado === 0} style={{ flex: 1, padding: '12px', backgroundColor: kwhEstimado === 0 ? '#4b5563' : (editandoId ? '#3b82f6' : '#8b5cf6'), color: 'white', border: 'none', borderRadius: '5px', cursor: kwhEstimado === 0 ? 'not-allowed' : 'pointer', fontWeight: 'bold' }}>
-              {editandoId ? '💾 Actualizar Requisito' : '➕ Guardar Requisito'}
+              {editandoId ? 'Actualizar Requisito' : 'Guardar Requisito'}
             </button>
             {editandoId && (
               <button type="button" onClick={resetFormulario} style={{ flex: 1, padding: '12px', backgroundColor: '#ef4444', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer', fontWeight: 'bold' }}>
-                ❌ Cancelar
+                Cancelar
               </button>
             )}
           </div>

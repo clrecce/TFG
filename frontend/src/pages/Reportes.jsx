@@ -37,12 +37,11 @@ export default function Reportes() {
   const baselineTradicional = data.reqs.length * 1.5; 
   const ahorroPorcentaje = baselineTradicional > 0 ? ((baselineTradicional - totalCo2Generacion) / baselineTradicional) * 100 : 0;
 
-  // Lógica de impresión PDF (La funcionalidad agregada)
+  // Lógica de impresión PDF
   const handleImprimirReal = () => {
 
-  // NUEVA VALIDACIÓN PARA EL PUNTO 3 (Integridad de datos)
     if (data.reqs.length === 0 || data.opts.length === 0) {
-      alert("⚠️ Validación ambiental: No hay suficientes datos (requisitos u optimizaciones) para generar un reporte con precisión ambiental. Por favor, complete los procesos de desarrollo primero.");
+      alert("Validación ambiental: No hay suficientes datos (requisitos u optimizaciones) para generar un reporte con precisión ambiental. Por favor, complete los procesos de desarrollo primero.");
       return;
     }
 
@@ -90,12 +89,12 @@ export default function Reportes() {
       
       {/* Cabecera de controles */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
-        <h2 style={{ color: '#4ade80', margin: 0 }}>📄 Generador de Reportes Ambientales</h2>
+        <h2 style={{ color: '#4ade80', margin: 0 }}>Generador de Reportes Ambientales</h2>
         <button 
           onClick={handleImprimirReal} 
           disabled={generando}
           style={{ padding: '10px 20px', backgroundColor: '#8b5cf6', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer', fontWeight: 'bold' }}>
-          {generando ? '📸 Capturando PDF...' : '📥 Descargar PDF Imprimible'}
+          {generando ? 'Capturando PDF...' : 'Descargar PDF Imprimible'}
         </button>
       </div>
 
@@ -148,7 +147,7 @@ export default function Reportes() {
         </div>
       </div>
 
-      <h3 style={{ color: '#a5b4fc', borderBottom: '1px solid #3a3a52', paddingBottom: '10px' }}>🗄️ Historial de Emisiones de Reportes (HU-007)</h3>
+      <h3 style={{ color: '#a5b4fc', borderBottom: '1px solid #3a3a52', paddingBottom: '10px' }}>Historial de Emisiones de Reportes</h3>
       <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '15px', backgroundColor: '#252536', borderRadius: '8px', overflow: 'hidden' }}>
         <thead>
           <tr style={{ backgroundColor: '#1a1a24', color: '#4ade80', textAlign: 'left' }}>

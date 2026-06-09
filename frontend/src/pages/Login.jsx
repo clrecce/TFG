@@ -51,7 +51,7 @@ export default function Login({ onLogin }) {
       <div style={{ backgroundColor: '#252536', padding: '40px', borderRadius: '10px', border: '1px solid #3a3a52', width: '100%', maxWidth: '400px', boxShadow: '0 10px 25px rgba(0,0,0,0.5)' }}>
         
         <div style={{ textAlign: 'center', marginBottom: '30px' }}>
-          <h1 style={{ color: '#4ade80', margin: '0 0 10px 0' }}>EcoDev Platform 🍃</h1>
+          <h1 style={{ color: '#4ade80', margin: '0 0 10px 0' }}>EcoDev Platform</h1>
           <p style={{ color: '#a5b4fc', margin: 0, fontSize: '14px' }}>
             {step === 1 ? 'Inicia sesión para acceder' : 'Autenticación Multifactor (MFA)'}
           </p>

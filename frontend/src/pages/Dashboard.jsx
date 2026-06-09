@@ -18,10 +18,9 @@ export default function Dashboard() {
           { nombre: 'Alertas Activas', valor: data.resumen.alertas.activas }
         ]);
         
-        // Simulación inicial (15 puntos) estrictamente debajo de 0.042
         const initialLive = Array.from({ length: 15 }).map((_, i) => ({
           hora: new Date(Date.now() - (14 - i) * 2000).toLocaleTimeString('es-AR', { hour12: false }),
-          co2_servidor: 0.02 + (Math.random() * 0.022) // Máximo matemático: 0.042
+          co2_servidor: 0.02 + (Math.random() * 0.022)
         }));
         setLiveTelemetry(initialLive);
       } catch (error) { console.error("Error cargando dashboard analítico:", error); }
@@ -54,7 +53,7 @@ export default function Dashboard() {
     return () => clearInterval(interval);
   }, [metrics]);
 
-  if (!metrics) return <div style={{ color: 'white', padding: '30px' }}>⏳ Cargando métricas reales de MySQL...</div>;
+  if (!metrics) return <div style={{ color: 'white', padding: '30px' }}>Cargando métricas reales de MySQL...</div>;
 
   const cardStyle = { backgroundColor: '#252536', padding: '20px', borderRadius: '8px', border: '1px solid #3a3a52', flex: '1 1 250px', boxSizing: 'border-box' };
   const labelStyle = { color: '#a5b4fc', fontSize: '14px', margin: 0 };
@@ -64,12 +63,11 @@ export default function Dashboard() {
   const ecoDevReal = metrics.impacto_ambiental.co2_total_generacion_kg;
   const porcentajeAhorro = baselineTradicional > 0 ? ((baselineTradicional - ecoDevReal) / baselineTradicional) * 100 : 0;
   
-  // Cálculo de los proyectos en planificación para que la cuenta cierre perfecto
   const proyectosPlanificacion = metrics.resumen.proyectos.total - metrics.resumen.proyectos.activos - metrics.resumen.proyectos.desplegados;
 
   return (
     <div style={{ padding: '20px', color: 'white', maxWidth: '1200px', margin: '0 auto' }}>
-      <h2 style={{ color: '#4ade80' }}>📊 Panel de Operaciones y Telemetría Sostenible</h2>
+      <h2 style={{ color: '#4ade80' }}>Panel de Operaciones y Telemetría Sostenible</h2>
       <p style={{ color: '#a5b4fc', marginBottom: '30px' }}>Visión unificada del ciclo de vida y monitoreo de emisiones en tiempo real.</p>
 
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '20px', marginBottom: '30px' }}>
@@ -93,7 +91,7 @@ export default function Dashboard() {
 
       <div style={{ backgroundColor: '#252536', padding: '20px', borderRadius: '8px', border: '1px solid #3a3a52', marginBottom: '30px', height: '350px' }}>
         <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px', gap: '10px' }}>
-          <h3 style={{ margin: 0, color: 'white', fontSize: '16px' }}>🔴 Telemetría de Servidores en Tiempo Real</h3>
+          <h3 style={{ margin: 0, color: 'white', fontSize: '16px' }}>Telemetría de Servidores en Tiempo Real</h3>
           <span style={{ backgroundColor: '#1e3a8a', color: '#93c5fd', padding: '5px 10px', borderRadius: '20px', fontSize: '12px', fontWeight: 'bold' }}>Monitoreo Cloud</span>
         </div>
         <ResponsiveContainer width="100%" height="90%">
@@ -128,14 +126,14 @@ export default function Dashboard() {
             <p style={{ margin: 0, color: '#d1d5db', fontSize: '12px' }}>Estimación Método Tradicional: <b style={{color: '#fca5a5'}}>{baselineTradicional.toFixed(2)} kg CO2</b></p>
           </div>
           <div style={{ textAlign: 'right' }}>
-            <p style={{ margin: '0 0 5px 0', color: '#a5b4fc', fontSize: '13px', fontWeight: 'bold' }}>Consumo Real con IA (EcoDev)</p>
+            <p style={{ margin: '0 0 5px 0', color: '#a5b4fc', fontSize: '13px', fontWeight: 'bold' }}>Consumo Real inferencia IA</p>
             <h1 style={{ color: '#fbbf24', fontSize: '36px', margin: 0 }}>{ecoDevReal.toFixed(6)}</h1>
             <strong style={{ color: '#fbbf24', fontSize: '14px' }}>kg CO2 Emitidos</strong>
           </div>
         </div>
 
         <div style={{ flex: '1 1 300px', backgroundColor: '#252536', padding: '20px', borderRadius: '8px', border: '1px solid #3a3a52', height: '250px' }}>
-          <h4 style={{ margin: '0 0 10px 0', color: 'white', fontSize: '14px' }}>Comparativa Operativa DER</h4>
+          <h4 style={{ margin: '0 0 10px 0', color: 'white', fontSize: '14px' }}>Comparativa Operativa</h4>
           <ResponsiveContainer width="100%" height="80%">
             <BarChart data={dataGrafico} layout="vertical">
               <CartesianGrid strokeDasharray="3 3" stroke="#3a3a52" />

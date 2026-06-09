@@ -63,14 +63,14 @@ function App() {
       {/* NAVEGACIÓN RESPONSIVE: flexWrap permite apilar los elementos en móvil */}
       <nav style={{ display: 'flex', flexWrap: 'wrap', gap: '15px', padding: '15px 20px', backgroundColor: '#1a1a24', borderBottom: '1px solid #3a3a52', alignItems: 'center', justifyContent: 'space-between' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
-          <div style={{ color: '#4ade80', fontWeight: 'bold', fontSize: '18px', marginRight: '10px' }}>EcoDev 🍃</div>
-          <NavLink to="/dashboard" style={navLinkStyle}>📊 Dashboard</NavLink>
-          {canViewProyectos && <NavLink to="/proyectos" style={navLinkStyle}>📁 Proyectos</NavLink>}
-          {canViewRequisitos && <NavLink to="/requisitos" style={navLinkStyle}>📋 Requisitos</NavLink>}
-          {canViewEditor && <NavLink to="/editor" style={navLinkStyle}>🏗️ Editor</NavLink>}
-          {canViewHistorial && <NavLink to="/historial" style={navLinkStyle}>⏱️ Historial</NavLink>}
-          {canViewReportes && <NavLink to="/reportes" style={navLinkStyle}>📄 Reportes</NavLink>}
-          {canViewCICD && <NavLink to="/despliegue" style={navLinkStyle}>🚀 CI/CD</NavLink>}
+          <div style={{ color: '#4ade80', fontWeight: 'bold', fontSize: '18px', marginRight: '10px' }}>EcoDev</div>
+          <NavLink to="/dashboard" style={navLinkStyle}>Dashboard</NavLink>
+          {canViewProyectos && <NavLink to="/proyectos" style={navLinkStyle}>Proyectos</NavLink>}
+          {canViewRequisitos && <NavLink to="/requisitos" style={navLinkStyle}>Requisitos</NavLink>}
+          {canViewEditor && <NavLink to="/editor" style={navLinkStyle}>Editor</NavLink>}
+          {canViewHistorial && <NavLink to="/historial" style={navLinkStyle}>Historial</NavLink>}
+          {canViewReportes && <NavLink to="/reportes" style={navLinkStyle}>Reportes</NavLink>}
+          {canViewCICD && <NavLink to="/despliegue" style={navLinkStyle}>CI/CD</NavLink>}
         </div>
         
         <div style={{ display: 'flex', alignItems: 'center', gap: '15px', flexWrap: 'wrap' }}>
@@ -78,8 +78,8 @@ function App() {
             <span style={{ color: 'white', fontWeight: 'bold', display: 'block' }}>{user.email}</span>
             {user.rol}
           </div>
-          <NavLink to="/alertas" style={iconLinkStyle} title="Alertas Ambientales">🔔</NavLink>
-          {canViewConfig && <NavLink to="/configuracion" style={iconLinkStyle} title="Configuración de Sistema">⚙️</NavLink>}
+          <NavLink to="/alertas" style={iconLinkStyle} title="Alertas Ambientales">Alertas</NavLink>
+          {canViewConfig && <NavLink to="/configuracion" style={iconLinkStyle} title="Configuración de Sistema">Configuración</NavLink>}
           <button onClick={handleLogout} style={{ backgroundColor: 'transparent', color: '#ef4444', border: '1px solid #ef4444', padding: '6px 12px', borderRadius: '5px', cursor: 'pointer', fontWeight: 'bold' }}>Salir</button>
         </div>
       </nav>
