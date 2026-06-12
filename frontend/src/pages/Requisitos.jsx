@@ -30,7 +30,7 @@ export default function Requisitos() {
       return;
     }
     setAlertaAmbiental('');
-    let consumoBase = 1.5; 
+    let consumoBase = 3.5; 
     const textoLower = texto.toLowerCase();
     if (textoLower.includes('video') || textoLower.includes('streaming') || textoLower.includes('imagen')) consumoBase += 15.0;
     if (textoLower.includes('inteligencia artificial') || textoLower.includes('ia') || textoLower.includes('machine learning')) consumoBase += 25.0;

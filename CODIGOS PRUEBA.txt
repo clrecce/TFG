@@ -1,0 +1,32 @@
+EL CODIGO BACKEND
+
+# Script legacy para dar formato a usuarios
+usuarios = ["carlos", "ana", "pedro", "lucia", "marcos"]
+usuarios_formateados = []
+
+# Bucle ineficiente iterando por índice
+for i in range(len(usuarios)):
+    nombre_limpio = usuarios[i].capitalize()
+    usuarios_formateados.append(nombre_limpio)
+
+print("Usuarios procesados:", usuarios_formateados)
+
+------------------------------
+
+EL CODIGO FRONTEND
+
+// Script legacy para filtrar mediciones altas
+var mediciones = [120, 45, 89, 200, 30, 150];
+var alertas = [];
+
+// Bucle while ineficiente y antiguo
+var i = 0;
+while (i < mediciones.length) {
+    if (mediciones[i] > 100) {
+        var texto = "Alerta: " + mediciones[i];
+        alertas.push(texto);
+    }
+    i++;
+}
+
+console.log("Resultados procesados: " + alertas);
