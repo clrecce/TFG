@@ -134,14 +134,14 @@ export default function Reportes() {
           <div style={{ backgroundColor: boxBgColor, padding: '15px', border: `1px solid ${borderColor}`, borderRadius: '4px', marginBottom: '20px' }}>
             <h5 style={{ margin: '0 0 5px 0', color: textColor }}>* Aclaración Metodológica de Comparación:</h5>
             <p style={{ margin: 0, fontSize: '11px', lineHeight: '1.4', color: subTextColor }}>
-              El valor de <strong>"Desarrollo Tradicional"</strong> es una estimación académica basada en los principios de Green IT. Asume que la codificación manual de un requisito estándar requiere un promedio de 20 horas de estación de trabajo (consumo aprox. 0.175 kW) y red de desarrollo encendida, resultando en una huella teórica de 1.5 kg de CO2 por cada requerimiento relevado. Este parámetro permite evaluar la drástica reducción de tiempo de máquina al delegar la estructuración a Inteligencia Artificial.
+              El valor de <strong>"Desarrollo Tradicional"</strong> es una estimación académica basada en los principios de Green IT. Asume que la codificación manual de un requisito estándar requiere un promedio de 20 horas de estación de trabajo con un consumo de aprox. 0.175 kW por la red de desarrollo encendida, lo que multiplicado al Factor de Intensidad de Carbono de la Red Eléctrica (0.43 kgCO2/kw/h), resulta en una huella teórica de 1.5 kg de CO2 por cada requerimiento relevado. Este parámetro permite evaluar la reducción de tiempo de máquina al delegar la refactorización a la Inteligencia Artificial.
             </p>
           </div>
 
           <div style={{ backgroundColor: boxBgColor, padding: '20px', borderLeft: '4px solid #4ade80', borderRadius: '4px' }}>
             <h4 style={{ margin: '0 0 10px 0', color: pdfMode ? '#16a34a' : '#4ade80' }}>Certificado del Sistema</h4>
             <p style={{ margin: 0, fontSize: '13px', lineHeight: '1.6', color: subTextColor }}>
-              El sistema ha logrado un ahorro del <b>{ahorroPorcentaje.toFixed(2)}%</b> en la huella de carbono en la fase de codificación, cumpliendo exitosamente con el objetivo de reducción estipulado ( &gt;70% ).
+              El sistema ha logrado un ahorro del <b>{ahorroPorcentaje.toFixed(2)}%</b> en la huella de carbono en la fase de codificación, cumpliendo exitosamente con el objetivo de reducción estipulado ( reducción del 70% ).
             </p>
           </div>
         </div>
